@@ -268,7 +268,6 @@
 
       <!-- KEKERAPAN MURID TEGAR LEWAT & ANALISIS PUNCA -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Senarai Murid Tegar Datang Lewat -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
           <div class="px-5 py-4 border-b border-slate-200 bg-rose-50/50 flex justify-between items-center">
             <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
@@ -280,7 +279,6 @@
           </div>
         </div>
 
-        <!-- Analisis Pecahan Punca / Sebab Datang Lambat -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
           <div class="px-5 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
             <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
@@ -328,8 +326,8 @@
 
   <!-- ==================== JAVASCRIPT ==================== -->
   <script>
-    // MASUKKAN URL GOOGLE APPS SCRIPT BAHARU ANDA DI SINI:
-    const GAS_LEWAT_API_URL = "https://script.google.com/macros/s/GANTIKAN_DENGAN_URL_DEPLOY_APPS_SCRIPT_BAHARU/exec";
+    // URL GOOGLE APPS SCRIPT ANDA
+    const GAS_LEWAT_API_URL = "https://script.google.com/macros/s/AKfycbzclas6woxGLy0UNJDrerNhquwa5sDObYUvoyMrk2b152XwpXsnuD4FxhqiAeQKU1d4ow/exec";
 
     // DATA APDM 2027 SMK KAMARUL ARIFFIN
     const STUDENTS_DATA = {
@@ -426,7 +424,7 @@
       document.getElementById('selectTindakan').selectedIndex = 0;
     }
 
-    // SIMPAN REKOD KE GOOGLE APPS SCRIPT
+    // SIMPAN REKOD KE GOOGLE APPS SCRIPT / GOOGLE SHEETS
     async function saveLatenessRecord() {
       const btn = document.getElementById('btnSaveLateness');
       const tarikh = document.getElementById('inputTarikh').value;
@@ -456,74 +454,42 @@
       btn.disabled = true;
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
 
-      // Jika URL Google Apps Script sah digunakan
-      if (GAS_LEWAT_API_URL && !GAS_LEWAT_API_URL.includes("GANTIKAN_DENGAN")) {
-        try {
-          await fetch(GAS_LEWAT_API_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-
-          alert(`Kemasukan lewat bagi ${nama} (${kelas}) berjaya direkodkan!`);
-          btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Rekod Murid Lewat`;
-          setTimeout(loadRemoteLatenessData, 1500);
-          switchPage('dashboard');
-        } catch (e) {
-          alert("Ralat menghantar data: " + e.message);
-          btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Rekod Murid Lewat`;
-        }
-      } else {
-        // Mode Tempatan (LocalStorage) jika URL belum dimasukkan
-        const cached = JSON.parse(localStorage.getItem('smkka_lewat_records') || '[]');
-        cached.push({
-          id: "LWT_" + Date.now().toString().slice(-6),
-          recordTimestamp: new Date().toLocaleString('ms-MY'),
-          tarikh: payload.tarikh,
-          masaTiba: payload.masaTiba,
-          kelas: payload.kelas,
-          nama: payload.nama,
-          sebab: payload.sebab,
-          pencatat: payload.pencatat,
-          tindakan: payload.tindakan
+      try {
+        await fetch(GAS_LEWAT_API_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
         });
-        localStorage.setItem('smkka_lewat_records', JSON.stringify(cached));
-        latenessRecords = cached;
+
+        alert(`Kemasukan lewat bagi ${nama} (${kelas}) berjaya disimpan ke Google Sheets!`);
         btn.disabled = false;
         btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Rekod Murid Lewat`;
-        alert(`Rekod disimpan dalam storan tempatan! (Sila masukkan GAS_LEWAT_API_URL untuk sambungan Google Sheets sebenar).`);
+        setTimeout(loadRemoteLatenessData, 1500);
         switchPage('dashboard');
+      } catch (e) {
+        alert("Ralat menghantar data: " + e.message);
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Rekod Murid Lewat`;
       }
     }
 
-    // MUAT REKOD DARI GOOGLE APPS SCRIPT
+    // MUAT TURUN REKOD DARI GOOGLE APPS SCRIPT
     async function loadRemoteLatenessData() {
-      if (GAS_LEWAT_API_URL && !GAS_LEWAT_API_URL.includes("GANTIKAN_DENGAN")) {
-        try {
-          const res = await fetch(GAS_LEWAT_API_URL);
-          const data = await res.json();
-          if (Array.isArray(data)) {
-            latenessRecords = data;
-            renderDashboard();
-            renderStatistik();
-          }
-        } catch (e) {
-          console.warn("Gagal menghubungi Google Apps Script, menggunakan rekod cache tempatan:", e);
-          latenessRecords = JSON.parse(localStorage.getItem('smkka_lewat_records') || '[]');
+      try {
+        const res = await fetch(GAS_LEWAT_API_URL);
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          latenessRecords = data;
           renderDashboard();
           renderStatistik();
         }
-      } else {
-        latenessRecords = JSON.parse(localStorage.getItem('smkka_lewat_records') || '[]');
-        renderDashboard();
-        renderStatistik();
+      } catch (e) {
+        console.warn("Gagal menghubungi Google Apps Script:", e);
       }
     }
 
-    // ==================== DASHBOARD LOGIC ====================
+    // DASHBOARD LOGIC
     function renderDashboard() {
       const today = document.getElementById('inputTarikh').value || new Date().toISOString().split('T')[0];
       document.getElementById('dashTodayDateLabel').innerText = today;
@@ -531,7 +497,6 @@
       const recordsToday = latenessRecords.filter(r => r.tarikh === today);
       document.getElementById('dashTodayCount').innerText = `${recordsToday.length} Murid`;
 
-      // Kira kelas paling banyak lewat
       const classCount = {};
       let totalMins = 0;
       let validTimeCount = 0;
@@ -566,7 +531,6 @@
         document.getElementById('dashAvgLateTime').innerText = "--:--";
       }
 
-      // Isi Jadual Hari Ini
       const tbody = document.getElementById('dashTodayTableBody');
       tbody.innerHTML = '';
 
@@ -598,7 +562,7 @@
       });
     }
 
-    // ==================== STATISTIK & KEKERAPAN LOGIC ====================
+    // STATISTIK & KEKERAPAN LOGIC
     function getYesterdayDateStr(refDateStr) {
       const base = refDateStr ? new Date(refDateStr) : new Date();
       base.setDate(base.getDate() - 1);
@@ -673,7 +637,6 @@
       document.getElementById('subtextStatRange').innerText = `Menunjukkan rekod bagi sela masa: ${rangeLabel}`;
       document.getElementById('statTotalLateCases').innerText = `${filtered.length} Kes`;
 
-      // Kira kekerapan individu murid & punca lewat
       const freqStudent = {};
       const reasonCount = {};
 
@@ -685,7 +648,6 @@
 
       document.getElementById('statUniqueStudentsCount').innerText = `${Object.keys(freqStudent).length} Murid`;
 
-      // Cari Punca Utama
       let topReason = "--";
       let maxR = 0;
       Object.keys(reasonCount).forEach(s => {
@@ -696,7 +658,7 @@
       });
       document.getElementById('statTopReason').innerText = topReason;
 
-      // 1. Senarai Murid Tegar Datang Lambat (Disusun mengikut jumlah kali)
+      // 1. Senarai Kekerapan Murid Tegar Datang Lambat
       const listFreqEl = document.getElementById('listFrequentLateStudents');
       listFreqEl.innerHTML = '';
       const sortedFreq = Object.entries(freqStudent).sort((a, b) => b[1] - a[1]);
@@ -722,7 +684,7 @@
         });
       }
 
-      // 2. Pecahan Sebab Datang Lambat
+      // 2. Pecahan Punca / Sebab Datang Lambat
       const listReasonEl = document.getElementById('listReasonBreakdown');
       listReasonEl.innerHTML = '';
       const sortedReasons = Object.entries(reasonCount).sort((a, b) => b[1] - a[1]);
