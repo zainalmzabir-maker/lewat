@@ -7,9 +7,12 @@
   <!-- Tailwind CSS & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- SheetJS Library untuk bacaan fail Excel (.xlsx) di sisi klien -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .pulse-alert { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
@@ -41,6 +44,10 @@
         <button onclick="switchPage('statistik')" id="tab-statistik" class="nav-tab px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all text-slate-600 hover:text-rose-900">
           <i class="fa-solid fa-chart-column mr-1"></i> Statistik & Kekerapan
         </button>
+        <button onclick="switchPage('admin')" id="tab-admin" class="nav-tab px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all text-rose-700 hover:bg-rose-50 flex items-center gap-1.5">
+          <i class="fa-solid fa-user-shield"></i> Admin
+          <span id="badgeOrphanNotice" class="hidden w-2 h-2 rounded-full bg-rose-600 pulse-alert"></span>
+        </button>
       </nav>
     </div>
   </header>
@@ -58,7 +65,6 @@
             </h2>
             <p class="text-rose-200 text-xs mt-1">Daftar kemasukan murid yang tiba di pintu pagar sekolah selepas loceng dibunyikan.</p>
           </div>
-          <!-- Live Auto Clock -->
           <div class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 text-right">
             <span class="text-[10px] uppercase font-bold tracking-wider text-rose-200 block">Masa Semasa (Auto)</span>
             <span id="autoClock" class="font-mono font-bold text-base text-amber-300">--:--:--</span>
@@ -67,13 +73,11 @@
 
         <div class="p-6 space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <!-- Tarikh -->
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tarikh</label>
               <input type="date" id="inputTarikh" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-medium text-slate-800 focus:ring-2 focus:ring-rose-600 outline-none">
             </div>
 
-            <!-- Masa Tiba (Auto & Boleh Diselaraskan) -->
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Masa Tiba di Pagar</label>
               <div class="flex gap-2">
@@ -84,7 +88,6 @@
               </div>
             </div>
 
-            <!-- Nama Guru / Pengawas Bertugas -->
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Guru / Pengawas Bertugas</label>
               <input type="text" id="inputPencatat" placeholder="Contoh: Cikgu Rosli / Pengawas Aiman" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-medium text-slate-800 focus:ring-2 focus:ring-rose-600 outline-none">
@@ -92,14 +95,12 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
-            <!-- Pilihan Kelas -->
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tingkatan / Kelas</label>
               <select id="selectKelas" onchange="populateStudentSelect()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-bold text-slate-800 focus:ring-2 focus:ring-rose-600 outline-none">
               </select>
             </div>
 
-            <!-- Pilihan Nama Murid Dari Kelas Terpilih -->
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nama Murid</label>
               <select id="selectMurid" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-semibold text-slate-800 focus:ring-2 focus:ring-rose-600 outline-none">
@@ -108,7 +109,6 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
-            <!-- Sebab Lewat -->
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Sebab Ketibaan Lewat</label>
               <select id="selectSebab" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-semibold text-slate-800 focus:ring-2 focus:ring-rose-600 outline-none">
@@ -122,7 +122,6 @@
               </select>
             </div>
 
-            <!-- Tindakan Awal Disiplin -->
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tindakan / Catatan Awal</label>
               <select id="selectTindakan" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-semibold text-slate-800 focus:ring-2 focus:ring-rose-600 outline-none">
@@ -135,7 +134,6 @@
             </div>
           </div>
 
-          <!-- ACTION BUTTON -->
           <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
             <button onclick="resetPelaporanForm()" class="px-5 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-600 hover:bg-slate-100 transition">
               <i class="fa-solid fa-rotate-left mr-1"></i> Batal
@@ -182,7 +180,6 @@
         </div>
       </div>
 
-      <!-- JADUAL LOG KEMASUKAN HARI INI -->
       <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4">
           <div>
@@ -207,7 +204,6 @@
               </tr>
             </thead>
             <tbody id="dashTodayTableBody" class="divide-y divide-slate-100">
-              <!-- Dijana melalui JS -->
             </tbody>
           </table>
         </div>
@@ -246,7 +242,6 @@
           </div>
         </div>
 
-        <!-- Kad Metrik Statistik -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
           <div class="bg-rose-50 border border-rose-200 p-4 rounded-xl">
             <p class="text-xs font-bold text-rose-700">Jumlah Kes Lewat (Sela Masa)</p>
@@ -266,7 +261,6 @@
         </div>
       </div>
 
-      <!-- KEKERAPAN MURID TEGAR LEWAT & ANALISIS PUNCA -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
           <div class="px-5 py-4 border-b border-slate-200 bg-rose-50/50 flex justify-between items-center">
@@ -291,7 +285,6 @@
         </div>
       </div>
 
-      <!-- LOG LENGKAP MENGIKUT SELA MASA -->
       <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
           <div>
@@ -318,6 +311,99 @@
       </div>
     </section>
 
+    <!-- ==================== PAGE 4: ADMIN KEMASKINI MURID & PENGAPUNGAN ==================== -->
+    <section id="page-admin" class="hidden space-y-6">
+      <div id="adminAuthBox" class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="text-center space-y-2">
+          <div class="w-14 h-14 bg-rose-100 text-rose-700 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800">Akses Pentadbir (Admin e-Lewat)</h3>
+          <p class="text-xs text-slate-500">Sila masukkan kata laluan untuk mengemaskini senarai nama murid mengikut fail Excel APDM.</p>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kata Laluan Admin</label>
+          <input type="password" id="adminPasswordInput" placeholder="Masukkan password..." class="w-full border border-slate-300 rounded-xl px-4 py-2.5 font-medium outline-none focus:ring-2 focus:ring-rose-500 text-slate-800">
+        </div>
+        <button onclick="verifyAdminPassword()" class="w-full bg-rose-800 hover:bg-rose-900 text-white font-bold py-2.5 rounded-xl transition shadow-sm flex items-center justify-center gap-2">
+          <i class="fa-solid fa-key"></i> Sahkan Kata Laluan
+        </button>
+      </div>
+
+      <div id="adminPanelBox" class="hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+          <div class="flex flex-wrap justify-between items-center gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-file-excel text-emerald-600"></i> Muat Naik Fail Excel APDM Terkini (.xlsx / .xls)
+              </h3>
+              <p class="text-xs text-slate-500">Format fail mengandungi lembaran kelas (1S1 hingga 5S3). Sistem akan mengapungkan murid yang hilang berbanding data sedia ada.</p>
+            </div>
+            <button onclick="adminLogout()" class="text-xs text-rose-600 font-bold hover:underline">
+              <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Log Keluar Admin
+            </button>
+          </div>
+
+          <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center space-y-3">
+            <i class="fa-solid fa-cloud-arrow-up text-4xl text-rose-900"></i>
+            <div>
+              <label for="excelFileInput" class="cursor-pointer bg-rose-900 hover:bg-rose-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl inline-block transition shadow-sm">
+                Pilih Fail Excel APDM (.xlsx)
+              </label>
+              <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" onchange="handleExcelUpload(event)">
+            </div>
+            <p class="text-xs text-slate-400 font-medium" id="uploadFileName">Belum ada fail dipilih</p>
+          </div>
+
+          <!-- Pratonton Perubahan & Pengapungan Murid Hilang -->
+          <div id="adminPreviewArea" class="hidden space-y-5 pt-2">
+            <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p class="text-xs font-bold text-rose-950">Jumlah Kelas Dikesan: <span id="previewClassCount" class="font-black">0</span></p>
+                <p class="text-xs font-bold text-rose-800">Jumlah Murid Dalam Fail Baharu: <span id="previewStudentCount" class="font-black">0</span></p>
+              </div>
+              <button onclick="commitAdminUpdate()" id="btnCommitAdmin" class="bg-rose-900 hover:bg-rose-800 text-white font-bold text-xs px-6 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2">
+                <i class="fa-solid fa-floppy-disk"></i> Sahkan & Simpan ke Google Sheets
+              </button>
+            </div>
+
+            <!-- KAD AMARAN: MURID DIAPUNGKAN KERANA HILANG DARI XLS TERKINI -->
+            <div id="orphanBoxWrapper" class="bg-amber-50 border border-amber-200 rounded-2xl p-5 space-y-4">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-200 text-amber-900 flex items-center justify-center text-lg flex-shrink-0">
+                  <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                  <h4 class="font-black text-amber-950 text-sm sm:text-base">Murid Yang Tiada Dalam Fail Baharu (Diapungkan)</h4>
+                  <p class="text-xs text-amber-800 leading-relaxed mt-0.5">
+                    Nama murid di bawah wujud dalam pangkalan data semasa tetapi <strong>TIDAK DITEMUI</strong> dalam fail Excel baharu. Rekod lewat mereka <strong>tetap kekal</strong> sehingga anda membuat tindakan hapus di bawah.
+                  </p>
+                </div>
+              </div>
+
+              <div id="orphanStudentsList" class="space-y-2 max-h-[300px] overflow-y-auto">
+              </div>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl max-h-[220px] overflow-y-auto p-4 bg-slate-50/50">
+              <h4 class="font-bold text-xs uppercase text-slate-500 mb-2">Ringkasan Fail Baharu:</h4>
+              <div id="previewClassSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+          <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-users-slash text-slate-500"></i> Pangkalan Data Murid Semasa (Google Sheets)
+          </h3>
+          <p class="text-xs text-slate-500">Jumlah murid berdaftar yang aktif dalam sistem rekod e-Lewat SMKKA.</p>
+          <div id="currentFloatingContainer" class="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-[250px] overflow-y-auto">
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
@@ -329,8 +415,8 @@
     // URL GOOGLE APPS SCRIPT ANDA
     const GAS_LEWAT_API_URL = "https://script.google.com/macros/s/AKfycbzclas6woxGLy0UNJDrerNhquwa5sDObYUvoyMrk2b152XwpXsnuD4FxhqiAeQKU1d4ow/exec";
 
-    // DATA APDM 2027 SMK KAMARUL ARIFFIN
-    const STUDENTS_DATA = {
+    // DATA DEFAULT AWAL APDM 2027 SMK KAMARUL ARIFFIN
+    let STUDENTS_DATA = {
       "1S1": ["AISSY NAUFAL BIN ROSISKANDAR","AISY FATIH AMIRULLAH BIN AZMAN","DAMIA AMANI BINTI MOHD SUKRI @ MOHD SALLEH","FAIZ FAHRYZAL BIN MOHD HANIF","HOONG WAN WAN","JETHRO TAN HAO SHEN","LIM QI QUAN","LISA BINTI ROSLI","MICHELLE TAN MEI SEE","MUHAMMAD AARON EQUWAN BIN MOHD ISA","MUHAMMAD ADAM HARITH BIN MOHD FAUZI","MUHAMMAD ADHAM RAYYAN BIN MUHAMAD KHAIRUL","MUHAMMAD DANISH RIFQI BIN MOHD REDZUAN","MUHAMMAD FAZREEQ BIN MOHD FAZLY","MUHAMMAD HAKIMI BIN JAMALUDDIN","MUHAMMAD RAYYAN HAKIMY BIN SAMSUDIN","MUHAMMAD SYAQIL HARRAZ BIN MOHD HAFIZAN","NUR AINA DAMIA BINTI MUHAMMAD NUR ARIFFIN","NUR ALEESYA BALQIS BINTI MOHD YUSOF","NUR AMALIN AISYAH BINTI NOR ISKANDAR","NUR BALQIS BINTI SAIFUL BAHRI"],
       "1S2": ["ANIKET ROY A/L BIJOY ROY","AQIL SUFIAN BIN SULAIMAN","FAITH BINTI YUSOP","FARAH AZYANI BINTI ASMAN","KHAIRUL ALIF BIN RAZAK","LUQMAN HAKIM BIN SAID","MOHAMAD AMIRUL ASYRAF BIN MOHAMMAD FAZLI","MOHAMAD DANIAL HAIKAL BIN ROZAIDI","MUHAMMAD AFIQ DARWISY BIN ABDULLAH","MUHAMMAD AIDIL ASRAF BIN AHMAD","MUHAMMAD AMMAR SHAH BIN SHAHRIZAL","MUHAMMAD ASYRAF BIN ZAINAL","MUHAMMAD DHIA'UDDIN NAUFAL BIN MUHAMMAD HAFIZ","MUHAMMAD DINIE SYAZWAN BIN SHAMSUL ARIFFIN","MUHAMMAD FIRDAUS BIN YUSRI","MUHAMMAD NUR HAZIQ RAYYAN BIN RAIMI","NUR ALYA SHAZWANI BINTI ABDULLAH","NUR DAMIA QISTINA BINTI MOHAMMAD FARIQ","NUR FATIHAH BINTI ABDULLAH","NUR HAZIQAH BINTI RAZALI","NURUL FATIHAH BINTI MOHD RAZIF","PUTERA DANIAL ZAKWAN BIN KASMIDON","PUTERI NUR SHAHIRAH BINTI SHAH REZAL"],
       "2S1": ["AFIF DANIAL BIN AMIRUDDIN","AHMAD ZAFRAN BIN AHMAD ZAKWAN","AINUL MARDHIAH BINTI HAIRUL NIZAM","AIREL ARSYAD BIN AZRIN","ALYA NABILAH BINTI MOHD AZRUL","ALYSSA BINTI YUSOP","AWANGKU MUHAMMAD DANIAL BIN AWANGKU MOHD NIZAM","DAYANG NUR FARZANA BINTI ABDULLAH","FARISYA BINTI MOHD FAUZI","IZZ ZARA ZULAIKHA BINTI ABDULLAH","LIM JIA EN","MOHAMAD AQIL ZAFRI BIN MOHD ZALALUDDIN","MOHAMAD FARISH BIN AHMAD","MOHAMMAD ADIB FARHAN BIN MAZLAN","MUHAMMAD AFEEF DARWISY BIN MOHD RAZIF","MUHAMMAD ADAM BIN ABDULLAH","MUHAMMAD AMIRUL BIN MOHD FAIZAL","MUHAMMAD ARIF HAZIQ BIN MOHD ZAKI","MUHAMMAD HAZIQ HAKIMI BIN HAIRUDIN","NOOR ERYNA ERYSHA BINTI NOOR AZMAN","NOR AISYAH BINTI SUHAIMI","NUR ALEEYA NATASHA BINTI MOHD ROSLI","NUR DAMIA BATRISYIA BINTI ROSLAN"],
@@ -349,11 +435,15 @@
     let activeRange = 'day';
     let customSelectedDate = '';
 
+    // Admin Variables
+    let newlyExtractedData = null;
+    let missingStudentsList = [];
+
     window.onload = function() {
       initClock();
       initDefaultDate();
       setCurrentArrivalTime();
-      populateClassSelect();
+      loadLocalOrRemoteStudents();
       loadRemoteLatenessData();
     };
 
@@ -378,15 +468,27 @@
       document.getElementById('inputMasaTiba').value = `${hours}:${mins}`;
     }
 
+    function loadLocalOrRemoteStudents() {
+      const cached = localStorage.getItem('smkka_students_cache_lewat');
+      if (cached) {
+        try { STUDENTS_DATA = JSON.parse(cached); } catch(e) {}
+      }
+      populateClassSelect();
+    }
+
     function populateClassSelect() {
       const select = document.getElementById('selectKelas');
+      const currentVal = select.value;
       select.innerHTML = '';
       Object.keys(STUDENTS_DATA).forEach(cls => {
         const opt = document.createElement('option');
         opt.value = cls;
-        opt.textContent = `Kelas ${cls}`;
+        opt.textContent = `Kelas ${cls} (${STUDENTS_DATA[cls].length} Murid)`;
         select.appendChild(opt);
       });
+      if (currentVal && STUDENTS_DATA[currentVal]) {
+        select.value = currentVal;
+      }
       populateStudentSelect();
     }
 
@@ -404,7 +506,7 @@
     }
 
     function switchPage(pageId) {
-      ['pelaporan', 'dashboard', 'statistik'].forEach(p => {
+      ['pelaporan', 'dashboard', 'statistik', 'admin'].forEach(p => {
         document.getElementById(`page-${p}`).classList.add('hidden');
         document.getElementById(`tab-${p}`).classList.remove('bg-white', 'text-rose-950', 'shadow-sm');
         document.getElementById(`tab-${p}`).classList.add('text-slate-600');
@@ -416,6 +518,7 @@
 
       if (pageId === 'dashboard') renderDashboard();
       if (pageId === 'statistik') renderStatistik();
+      if (pageId === 'admin') renderFloatingContainer();
     }
 
     function resetPelaporanForm() {
@@ -424,7 +527,7 @@
       document.getElementById('selectTindakan').selectedIndex = 0;
     }
 
-    // SIMPAN REKOD KE GOOGLE APPS SCRIPT / GOOGLE SHEETS
+    // SIMPAN REKOD KE GOOGLE APPS SCRIPT
     async function saveLatenessRecord() {
       const btn = document.getElementById('btnSaveLateness');
       const tarikh = document.getElementById('inputTarikh').value;
@@ -474,13 +577,20 @@
       }
     }
 
-    // MUAT TURUN REKOD DARI GOOGLE APPS SCRIPT
+    // MUAT TURUN REKOD & MASTER MURID DARI GOOGLE APPS SCRIPT
     async function loadRemoteLatenessData() {
       try {
         const res = await fetch(GAS_LEWAT_API_URL);
         const data = await res.json();
-        if (Array.isArray(data)) {
-          latenessRecords = data;
+
+        if (data.students && Object.keys(data.students).length > 0) {
+          STUDENTS_DATA = data.students;
+          localStorage.setItem('smkka_students_cache_lewat', JSON.stringify(STUDENTS_DATA));
+          populateClassSelect();
+        }
+
+        if (Array.isArray(data.lateness)) {
+          latenessRecords = data.lateness;
           renderDashboard();
           renderStatistik();
         }
@@ -734,6 +844,250 @@
           fullTbody.appendChild(tr);
         });
       }
+    }
+
+    // ==================== LOGIK ADMIN, IMPORT EXCEL & PENGAPUNGAN ====================
+    function verifyAdminPassword() {
+      const pwd = document.getElementById('adminPasswordInput').value;
+      if (pwd === "adminlewat") {
+        document.getElementById('adminAuthBox').classList.add('hidden');
+        document.getElementById('adminPanelBox').classList.remove('hidden');
+        document.getElementById('adminPasswordInput').value = '';
+        renderFloatingContainer();
+      } else {
+        alert("Kata laluan salah! Sila masukkan 'adminlewat'.");
+      }
+    }
+
+    function adminLogout() {
+      document.getElementById('adminAuthBox').classList.remove('hidden');
+      document.getElementById('adminPanelBox').classList.add('hidden');
+      document.getElementById('adminPreviewArea').classList.add('hidden');
+      document.getElementById('uploadFileName').innerText = 'Belum ada fail dipilih';
+      newlyExtractedData = null;
+      missingStudentsList = [];
+    }
+
+    // Membaca fail Excel APDM dan mengesan murid yang hilang
+    function handleExcelUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      document.getElementById('uploadFileName').innerText = `Fail: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+
+          const newStudentsData = {};
+          let totalExtracted = 0;
+
+          workbook.SheetNames.forEach(sheetName => {
+            const sheet = workbook.Sheets[sheetName];
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            const studentList = [];
+
+            for (let r = 0; r < rows.length; r++) {
+              const row = rows[r];
+              if (!row || row.length < 2) continue;
+
+              for (let colIdx = 0; colIdx < row.length; colIdx++) {
+                const val = row[colIdx];
+                if (typeof val === 'string' && val.length > 3) {
+                  const upper = val.toUpperCase();
+                  if (!upper.includes("NAMA") && !upper.includes("SEKOLAH") && !upper.includes("KAD PENGENALAN") && !upper.includes("JANTINA") && !upper.includes("ISLAM") && !upper.includes("MELAYU") && isNaN(upper)) {
+                    const prevVal = row[colIdx - 1];
+                    if (prevVal !== undefined && !isNaN(prevVal) && prevVal !== "") {
+                      studentList.push(val.trim());
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+
+            if (studentList.length > 0 && !sheetName.includes("SEMUA") && !sheetName.includes("JUMLAH") && !sheetName.includes("GURU") && !sheetName.includes("AGAMA")) {
+              newStudentsData[sheetName.trim()] = studentList;
+              totalExtracted += studentList.length;
+            }
+          });
+
+          if (Object.keys(newStudentsData).length > 0) {
+            newlyExtractedData = newStudentsData;
+            detectMissingStudents(newStudentsData);
+            showAdminPreview(newStudentsData, totalExtracted);
+          } else {
+            alert("Tiada data murid dikesan. Sila pastikan format sheet mengandungi nama kelas (1S1, 1S2, dsb).");
+          }
+
+        } catch (err) {
+          alert("Gagal membaca fail Excel: " + err.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // Mengesan perbezaan data (Delta Detection)
+    function detectMissingStudents(newData) {
+      missingStudentsList = [];
+
+      Object.keys(STUDENTS_DATA).forEach(cls => {
+        const oldList = STUDENTS_DATA[cls] || [];
+        const newList = newData[cls] || [];
+
+        oldList.forEach(oldName => {
+          if (!newList.includes(oldName)) {
+            missingStudentsList.push({
+              nama: oldName,
+              kelas: cls,
+              action: 'keep' // Default: KEKALKAN
+            });
+          }
+        });
+      });
+    }
+
+    function showAdminPreview(data, totalStudents) {
+      document.getElementById('adminPreviewArea').classList.remove('hidden');
+      document.getElementById('previewClassCount').innerText = Object.keys(data).length;
+      document.getElementById('previewStudentCount').innerText = totalStudents;
+
+      renderOrphanListUI();
+
+      const summaryDiv = document.getElementById('previewClassSummary');
+      summaryDiv.innerHTML = '';
+      Object.keys(data).forEach(cls => {
+        const badge = document.createElement('div');
+        badge.className = "bg-white p-2.5 rounded-lg border border-slate-200 flex justify-between items-center shadow-2xs";
+        badge.innerHTML = `
+          <span class="font-bold text-slate-700">${cls}</span>
+          <span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-extrabold">${data[cls].length} Murid</span>
+        `;
+        summaryDiv.appendChild(badge);
+      });
+    }
+
+    // Papar Antaramuka Murid Diapungkan
+    function renderOrphanListUI() {
+      const container = document.getElementById('orphanStudentsList');
+      container.innerHTML = '';
+
+      if (missingStudentsList.length === 0) {
+        container.innerHTML = `
+          <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold p-3.5 rounded-xl flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
+            Tiada murid yang hilang. Semua murid daripada rekod terdahulu ditemui dalam fail Excel baharu!
+          </div>
+        `;
+        return;
+      }
+
+      missingStudentsList.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = "bg-white p-3.5 rounded-xl border border-amber-200 flex flex-wrap items-center justify-between gap-3 shadow-xs";
+        div.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-lg bg-amber-100 text-amber-900 font-black text-xs flex items-center justify-center">${index + 1}</span>
+            <div>
+              <p class="text-xs font-bold text-slate-800">${item.nama}</p>
+              <p class="text-[11px] font-semibold text-amber-800">Kelas: ${item.kelas} (Tiada dalam XLS Baharu)</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-[11px] font-bold text-slate-500 mr-1">Tindakan:</label>
+            <button onclick="setOrphanAction(${index}, 'keep')" class="text-xs px-3 py-1.5 rounded-lg font-bold transition ${item.action === 'keep' ? 'bg-emerald-700 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+              <i class="fa-solid fa-shield-halved mr-1"></i> Kekalkan Murid
+            </button>
+            <button onclick="setOrphanAction(${index}, 'purge')" class="text-xs px-3 py-1.5 rounded-lg font-bold transition ${item.action === 'purge' ? 'bg-rose-700 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+              <i class="fa-solid fa-trash mr-1"></i> Hapus dari Kelas
+            </button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function setOrphanAction(index, action) {
+      if (missingStudentsList[index]) {
+        missingStudentsList[index].action = action;
+        renderOrphanListUI();
+      }
+    }
+
+    // Sahkan & Simpan Pangkalan Data Baru ke Google Sheets
+    async function commitAdminUpdate() {
+      if (!newlyExtractedData) {
+        alert("Sila pilih fail Excel terlebih dahulu.");
+        return;
+      }
+
+      const btn = document.getElementById('btnCommitAdmin');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan ke Google Sheets...`;
+
+      const finalStudentsData = JSON.parse(JSON.stringify(newlyExtractedData));
+      const archivedToPurge = [];
+
+      missingStudentsList.forEach(m => {
+        if (m.action === 'keep') {
+          if (!finalStudentsData[m.kelas]) finalStudentsData[m.kelas] = [];
+          if (!finalStudentsData[m.kelas].includes(m.nama)) {
+            finalStudentsData[m.kelas].push(m.nama);
+          }
+        } else if (m.action === 'purge') {
+          archivedToPurge.push({ nama: m.nama, kelas: m.kelas });
+        }
+      });
+
+      const payload = {
+        action: "updateStudents",
+        password: "adminlewat",
+        studentsData: finalStudentsData,
+        archivedStudents: archivedToPurge
+      };
+
+      try {
+        await fetch(GAS_LEWAT_API_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        STUDENTS_DATA = finalStudentsData;
+        localStorage.setItem('smkka_students_cache_lewat', JSON.stringify(STUDENTS_DATA));
+        populateClassSelect();
+
+        alert(`Senarai murid berjaya disimpan! ${archivedToPurge.length} murid telah disahkan keluar/dihapuskan.`);
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Sahkan & Simpan ke Google Sheets`;
+        switchPage('pelaporan');
+      } catch (e) {
+        alert("Ralat mengemaskini ke Google Sheets: " + e.message);
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Sahkan & Simpan ke Google Sheets`;
+      }
+    }
+
+    function renderFloatingContainer() {
+      const container = document.getElementById('currentFloatingContainer');
+      container.innerHTML = '';
+
+      let count = 0;
+      Object.keys(STUDENTS_DATA).forEach(cls => {
+        STUDENTS_DATA[cls].forEach(studentName => {
+          count++;
+        });
+      });
+
+      container.innerHTML = `
+        <div class="p-4 bg-slate-50 flex justify-between items-center text-xs">
+          <span class="font-bold text-slate-700">Jumlah Murid Berdaftar: ${count} Murid</span>
+          <span class="text-slate-500 italic">Disegerakkan dengan pangkalan data Google Sheets.</span>
+        </div>
+      `;
     }
   </script>
 </body>
