@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Murid Datang Lewat 2027 - SMK Kamarul Ariffin</title>
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+
+  <!-- TOP HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3.5">
+        <img src="logo.png" alt="Logo SMK Kamarul Ariffin" class="h-14 w-auto object-contain drop-shadow-sm" onerror="this.src='https://placehold.co/100x120?text=SMKKA'"/>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl sm:text-2xl font-black text-rose-950 tracking-tight">SMK KAMARUL ARIFFIN</h1>
+            <span class="bg-amber-400 text-slate-900 text-xs px-2.5 py-0.5 rounded-full font-black shadow-2xs">2027</span>
+          </div>
+          <p class="text-xs sm:text-sm font-semibold text-rose-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-person-running"></i> Sistem Rekod & Analisis Murid Datang Lewat (e-Lewat)
+          </p>
+        </div>
+      </div>
+
+      <!-- NAVIGATION TABS -->
+      <nav class="flex bg-slate-100 p-1.5 rounded-xl gap-1">
+        <button onclick="switchPage('pelaporan')" id="tab-pelaporan" class="nav-tab px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all bg-white text-rose-950 shadow-sm">
+          <i class="fa-solid fa-clock-user mr-1"></i> Pelaporan Pintu Pagar
+        </button>
+        <button onclick="switchPage('dashboard')" id="tab-dashboard" class="nav-tab px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all text-slate-600 hover:text-rose-900">
+          <i class="fa-solid fa-chart-pie mr-1"></i> Dashboard Hari Ini
+        </button>
+        <button onclick="switchPage('statistik')" id="tab-statistik" class="nav-tab px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all text-slate-600 hover:text-rose-900">
+          <i class="fa-solid fa-chart-column mr-1"></i> Statistik & Kekerapan
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
+
+    <!-- ==================== PAGE 1: PELAPORAN DATANG LAMBAT ==================== -->
+    <section id="page-pelaporan" class="block space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-rose-950 via-rose-900 to-red-900 p-6 text-white flex flex-wrap justify-between items-center gap-4">
+          <div>
+            <h2 class="text-xl font-bold flex items-center gap-2">
+              <i class="fa-solid fa-id-badge text-amber-400"></i> Borang Rekod Murid Datang Lambat (2027)
+            </h2>
+            <p class="text-rose-200 text-xs mt-1">Daftar kemasukan murid yang tiba di pintu pagar sekolah selepas loceng dibunyikan.</p>
+          </div>
+          <!-- Live Auto Clock -->
+          <div class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 text-right">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-rose-200 block">Masa Semasa (Auto)</span>
+            <span id="autoClock" class="font-mono font-bold text-base text-amber-300">--:--:--</span>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <!-- Tarikh -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tarikh</label>
+              <input type="date" id="inputTarikh" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-medium text-slate-800 focus:ring-2 focus:ring-rose-600 outline-none">
+            </div>
+
+            <!-- Masa Tiba (Auto & Boleh Diselaraskan) -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Masa Tiba di Pagar</label>
+              <div class="flex gap-2">
+                <input type="time" id="inputMasaTiba" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-bold text-rose-800 focus:ring-2 focus:ring-rose-600 outline-none">
+                <button onclick="setCurrentArrivalTime()" title="Gunakan Waktu Sekarang" class="px-3 bg-slate-200 hover:bg-slate-300 rounded-xl text-slate-700 text-xs font-bold transition">
+                  <i class="fa-solid fa-clock"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Nama Guru / Pengawas Bertugas -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Guru / Pengawas Bertugas</label>
+              <input type="text" id="inputPencatat" placeholder="Contoh: Cikgu Rosli / Pengawas Aiman" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-medium text-slate-800 focus:ring-2 focus:ring-rose-600 outline-none">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+            <!-- Pilihan Kelas -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tingkatan / Kelas</label>
+              <select id="selectKelas" onchange="populateStudentSelect()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-bold text-slate-800 focus:ring-2 focus:ring-rose-600 outline-none">
+              </select>
+            </div>
+
+            <!-- Pilihan Nama Murid Dari Kelas Terpilih -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nama Murid</label>
+              <select id="selectMurid" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-semibold text-slate-800 focus:ring-2 focus:ring-rose-600 outline-none">
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+            <!-- Sebab Lewat -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Sebab Ketibaan Lewat</label>
+              <select id="selectSebab" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-semibold text-slate-800 focus:ring-2 focus:ring-rose-600 outline-none">
+                <option value="Bangun Lewat / Terlajak Tidur">Bangun Lewat / Terlajak Tidur</option>
+                <option value="Masalah Kenderaan / Kereta Rosak / Rantai Putus">Masalah Kenderaan / Rosak</option>
+                <option value="Kesesakan Lalu Lintas">Kesesakan Lalu Lintas</option>
+                <option value="Cuaca Buruk / Hujan Lebat">Cuaca Buruk / Hujan Lebat</option>
+                <option value="Masalah Kesihatan / Kurang Sihat">Masalah Kesihatan / Kurang Sihat</option>
+                <option value="Menghantar Adik / Urusan Keluarga">Menghantar Adik / Urusan Keluarga</option>
+                <option value="Lain-lain Sebab (Tiada Alasan Munasabah)">Lain-lain Sebab</option>
+              </select>
+            </div>
+
+            <!-- Tindakan Awal Disiplin -->
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tindakan / Catatan Awal</label>
+              <select id="selectTindakan" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 font-semibold text-slate-800 focus:ring-2 focus:ring-rose-600 outline-none">
+                <option value="Nasihat & Amaran Lisan">Nasihat & Amaran Lisan</option>
+                <option value="Catat Buku Kawalan Disiplin">Catat Buku Kawalan Disiplin</option>
+                <option value="Khidmat Komuniti Pagi (Kutip Sampah)">Khidmat Komuniti Pagi</option>
+                <option value="Rujukan Guru Bimbingan & Kaunseling">Rujuk Kaunseling</option>
+                <option value="Panggilan Ibu Bapa (Kerap Lewat)">Panggilan Ibu Bapa</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ACTION BUTTON -->
+          <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+            <button onclick="resetPelaporanForm()" class="px-5 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-600 hover:bg-slate-100 transition">
+              <i class="fa-solid fa-rotate-left mr-1"></i> Batal
+            </button>
+            <button onclick="saveLatenessRecord()" id="btnSaveLateness" class="px-7 py-2.5 rounded-xl bg-rose-900 hover:bg-rose-800 text-white font-bold shadow-md shadow-rose-950/20 transition flex items-center gap-2">
+              <i class="fa-solid fa-floppy-disk"></i> Simpan Rekod Murid Lewat
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PAGE 2: DASHBOARD HARI INI ==================== -->
+    <section id="page-dashboard" class="hidden space-y-6">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-xl font-bold">
+            <i class="fa-solid fa-user-clock"></i>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-slate-500 uppercase">Jumlah Lewat Hari Ini</p>
+            <h3 class="text-2xl font-black text-rose-700" id="dashTodayCount">0 Murid</h3>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-xl font-bold">
+            <i class="fa-solid fa-school-circle-exclamation"></i>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-slate-500 uppercase">Kelas Paling Banyak Lewat</p>
+            <h3 class="text-xl font-black text-amber-800" id="dashTopLateClass">--</h3>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center text-xl font-bold">
+            <i class="fa-solid fa-stopwatch"></i>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-slate-500 uppercase">Purata Masa Ketibaan Lewat</p>
+            <h3 class="text-xl font-black text-blue-900" id="dashAvgLateTime">--:--</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- JADUAL LOG KEMASUKAN HARI INI -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4">
+          <div>
+            <h3 class="font-bold text-slate-800 text-lg">Senarai Murid Tiba Lewat Hari Ini (<span id="dashTodayDateLabel">--</span>)</h3>
+            <p class="text-xs text-slate-500">Log murid yang direkodkan tiba di sekolah selepas waktu rasmi persekolahan.</p>
+          </div>
+          <button onclick="loadRemoteLatenessData()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-arrows-rotate"></i> Muat Semula Data
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-slate-500 font-bold text-xs uppercase border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-5">Masa Tiba</th>
+                <th class="py-3 px-5">Kelas</th>
+                <th class="py-3 px-5">Nama Murid</th>
+                <th class="py-3 px-5">Sebab Lewat</th>
+                <th class="py-3 px-5">Pencatat</th>
+                <th class="py-3 px-5">Tindakan Disiplin</th>
+              </tr>
+            </thead>
+            <tbody id="dashTodayTableBody" class="divide-y divide-slate-100">
+              <!-- Dijana melalui JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PAGE 3: STATISTIK & KEKERAPAN ==================== -->
+    <section id="page-statistik" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5">
+        <div class="flex flex-wrap justify-between items-center gap-4">
+          <div>
+            <h3 class="font-bold text-lg text-slate-800">Penapis Statistik & Analisis Murid Lewat</h3>
+            <p class="text-xs text-slate-500">Pilih sela masa untuk mengenal pasti punca dan murid tegar datang lambat.</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 bg-slate-100 p-1.5 rounded-xl">
+            <button onclick="setTimeRange('yesterday')" id="filter-yesterday" class="filter-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition hover:text-rose-900">
+              Semalam
+            </button>
+            <button onclick="setTimeRange('day')" id="filter-day" class="filter-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-white shadow-xs text-rose-900 transition">
+              Hari Ini
+            </button>
+            <button onclick="setTimeRange('week')" id="filter-week" class="filter-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition hover:text-rose-900">
+              Minggu Ini
+            </button>
+            <button onclick="setTimeRange('month')" id="filter-month" class="filter-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition hover:text-rose-900">
+              Bulan Ini
+            </button>
+            <button onclick="setTimeRange('year')" id="filter-year" class="filter-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition hover:text-rose-900">
+              Tahun 2027
+            </button>
+            <div class="flex items-center pl-2 border-l border-slate-300 gap-1">
+              <label for="filterCustomDate" class="text-[11px] font-bold text-slate-500 uppercase">Tarikh Khusus:</label>
+              <input type="date" id="filterCustomDate" onchange="onCustomDateChange()" class="bg-white border border-slate-300 text-xs font-semibold rounded-lg px-2 py-1 text-slate-700 outline-none focus:ring-1 focus:ring-rose-600 cursor-pointer">
+            </div>
+          </div>
+        </div>
+
+        <!-- Kad Metrik Statistik -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+          <div class="bg-rose-50 border border-rose-200 p-4 rounded-xl">
+            <p class="text-xs font-bold text-rose-700">Jumlah Kes Lewat (Sela Masa)</p>
+            <p class="text-3xl font-black text-rose-900 mt-1" id="statTotalLateCases">0 Kes</p>
+            <p class="text-[11px] text-rose-600 mt-0.5" id="statSelectedRangeText">Hari Ini</p>
+          </div>
+          <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl">
+            <p class="text-xs font-bold text-amber-700">Bilangan Murid Terlibat (Individu)</p>
+            <p class="text-3xl font-black text-amber-800 mt-1" id="statUniqueStudentsCount">0 Murid</p>
+            <p class="text-[11px] text-amber-600 mt-0.5">Murid berbeza</p>
+          </div>
+          <div class="bg-purple-50 border border-purple-200 p-4 rounded-xl">
+            <p class="text-xs font-bold text-purple-700">Punca Utama Ketibaan Lewat</p>
+            <p class="text-lg font-black text-purple-950 mt-1 truncate" id="statTopReason">--</p>
+            <p class="text-[11px] text-purple-600 mt-0.5">Kekerapan tertinggi</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- KEKERAPAN MURID TEGAR LEWAT & ANALISIS PUNCA -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Senarai Murid Tegar Datang Lewat -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="px-5 py-4 border-b border-slate-200 bg-rose-50/50 flex justify-between items-center">
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation text-rose-600"></i> Kekerapan Murid Datang Lambat (Tegar)
+            </h4>
+            <span class="text-xs bg-rose-200/60 text-rose-800 font-bold px-2.5 py-0.5 rounded-full" id="countFrequentLateBadge">0 Murid</span>
+          </div>
+          <div class="p-4 flex-1 overflow-y-auto max-h-[360px]" id="listFrequentLateStudents">
+          </div>
+        </div>
+
+        <!-- Analisis Pecahan Punca / Sebab Datang Lambat -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+          <div class="px-5 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-slate-600"></i> Pecahan Sebab Ketibaan Lewat
+            </h4>
+            <span class="text-xs text-slate-500 font-medium">Berdasarkan Sela Masa</span>
+          </div>
+          <div class="p-4 flex-1 overflow-y-auto max-h-[360px]" id="listReasonBreakdown">
+          </div>
+        </div>
+      </div>
+
+      <!-- LOG LENGKAP MENGIKUT SELA MASA -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+          <div>
+            <h4 class="font-bold text-slate-800 text-base">Senarai Penuh Rekod Murid Datang Lewat (Sela Masa Terpilih)</h4>
+            <p class="text-xs text-slate-500" id="subtextStatRange">Memaparkan semua butiran murid tiba lambat.</p>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-slate-500 font-bold text-xs uppercase border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-5">Tarikh</th>
+                <th class="py-3 px-5">Masa Tiba</th>
+                <th class="py-3 px-5">Kelas</th>
+                <th class="py-3 px-5">Nama Murid</th>
+                <th class="py-3 px-5">Sebab Lewat</th>
+                <th class="py-3 px-5">Tindakan Disiplin</th>
+              </tr>
+            </thead>
+            <tbody id="statFullTableBody" class="divide-y divide-slate-100">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
+    &copy; 2027 SMK Kamarul Ariffin (JEA7039). Hak Cipta Terpelihara. Sistem Kawalan Disiplin & e-Lewat.
+  </footer>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    // MASUKKAN URL GOOGLE APPS SCRIPT BAHARU ANDA DI SINI:
+    const GAS_LEWAT_API_URL = "https://script.google.com/macros/s/GANTIKAN_DENGAN_URL_DEPLOY_APPS_SCRIPT_BAHARU/exec";
+
+    // DATA APDM 2027 SMK KAMARUL ARIFFIN
+    const STUDENTS_DATA = {
+      "1S1": ["AISSY NAUFAL BIN ROSISKANDAR","AISY FATIH AMIRULLAH BIN AZMAN","DAMIA AMANI BINTI MOHD SUKRI @ MOHD SALLEH","FAIZ FAHRYZAL BIN MOHD HANIF","HOONG WAN WAN","JETHRO TAN HAO SHEN","LIM QI QUAN","LISA BINTI ROSLI","MICHELLE TAN MEI SEE","MUHAMMAD AARON EQUWAN BIN MOHD ISA","MUHAMMAD ADAM HARITH BIN MOHD FAUZI","MUHAMMAD ADHAM RAYYAN BIN MUHAMAD KHAIRUL","MUHAMMAD DANISH RIFQI BIN MOHD REDZUAN","MUHAMMAD FAZREEQ BIN MOHD FAZLY","MUHAMMAD HAKIMI BIN JAMALUDDIN","MUHAMMAD RAYYAN HAKIMY BIN SAMSUDIN","MUHAMMAD SYAQIL HARRAZ BIN MOHD HAFIZAN","NUR AINA DAMIA BINTI MUHAMMAD NUR ARIFFIN","NUR ALEESYA BALQIS BINTI MOHD YUSOF","NUR AMALIN AISYAH BINTI NOR ISKANDAR","NUR BALQIS BINTI SAIFUL BAHRI"],
+      "1S2": ["ANIKET ROY A/L BIJOY ROY","AQIL SUFIAN BIN SULAIMAN","FAITH BINTI YUSOP","FARAH AZYANI BINTI ASMAN","KHAIRUL ALIF BIN RAZAK","LUQMAN HAKIM BIN SAID","MOHAMAD AMIRUL ASYRAF BIN MOHAMMAD FAZLI","MOHAMAD DANIAL HAIKAL BIN ROZAIDI","MUHAMMAD AFIQ DARWISY BIN ABDULLAH","MUHAMMAD AIDIL ASRAF BIN AHMAD","MUHAMMAD AMMAR SHAH BIN SHAHRIZAL","MUHAMMAD ASYRAF BIN ZAINAL","MUHAMMAD DHIA'UDDIN NAUFAL BIN MUHAMMAD HAFIZ","MUHAMMAD DINIE SYAZWAN BIN SHAMSUL ARIFFIN","MUHAMMAD FIRDAUS BIN YUSRI","MUHAMMAD NUR HAZIQ RAYYAN BIN RAIMI","NUR ALYA SHAZWANI BINTI ABDULLAH","NUR DAMIA QISTINA BINTI MOHAMMAD FARIQ","NUR FATIHAH BINTI ABDULLAH","NUR HAZIQAH BINTI RAZALI","NURUL FATIHAH BINTI MOHD RAZIF","PUTERA DANIAL ZAKWAN BIN KASMIDON","PUTERI NUR SHAHIRAH BINTI SHAH REZAL"],
+      "2S1": ["AFIF DANIAL BIN AMIRUDDIN","AHMAD ZAFRAN BIN AHMAD ZAKWAN","AINUL MARDHIAH BINTI HAIRUL NIZAM","AIREL ARSYAD BIN AZRIN","ALYA NABILAH BINTI MOHD AZRUL","ALYSSA BINTI YUSOP","AWANGKU MUHAMMAD DANIAL BIN AWANGKU MOHD NIZAM","DAYANG NUR FARZANA BINTI ABDULLAH","FARISYA BINTI MOHD FAUZI","IZZ ZARA ZULAIKHA BINTI ABDULLAH","LIM JIA EN","MOHAMAD AQIL ZAFRI BIN MOHD ZALALUDDIN","MOHAMAD FARISH BIN AHMAD","MOHAMMAD ADIB FARHAN BIN MAZLAN","MUHAMMAD AFEEF DARWISY BIN MOHD RAZIF","MUHAMMAD ADAM BIN ABDULLAH","MUHAMMAD AMIRUL BIN MOHD FAIZAL","MUHAMMAD ARIF HAZIQ BIN MOHD ZAKI","MUHAMMAD HAZIQ HAKIMI BIN HAIRUDIN","NOOR ERYNA ERYSHA BINTI NOOR AZMAN","NOR AISYAH BINTI SUHAIMI","NUR ALEEYA NATASHA BINTI MOHD ROSLI","NUR DAMIA BATRISYIA BINTI ROSLAN"],
+      "2S2": ["AHMAD HAZIQ BIN MOHD HARIS","AIREEN BATRISYIA BINTI MOHD FAZLY","AINUR JANNAH BINTI ABDULLAH","AIRIL SHAH BIN ABDULLAH","DANISH HAIKAL BIN KAMARUDIN","EZRA VALENTINE A/L ANTHONY","FARID ISKANDAR BIN ISMAIL","FATIN NUR ALISA BINTI ZAINAL","KHAIRUNNISA BINTI ZULKIFLI","MOHAMMAD DANISH HAKIM BIN MOHD YAZID","MUHAMMAD AIDIL SAFWAN BIN SAIFUL","MUHAMMAD ALIF IKHMAL BIN AZLAN","MUHAMMAD AMIRUL HAKIM BIN ROSLAN","MUHAMMAD AQIL DANIAL BIN AZMAN","MUHAMMAD DARWISY BIN NOR AZIZI","MUHAMMAD FARHAN BIN YUSOF","MUHAMMAD HARITH IZZAT BIN HAMDAN","MUHAMMAD IZZUL ISLAM BIN ROSTAM","NUR ADRIANA BATRISYIA BINTI MOHD FAIZAL","NUR AIN SHAFIEQAH BINTI SHAHRIL","NUR ALEESYA HUMAIRA BINTI MOHD KHAIRUL","NUR DAMIA INSYIRAH BINTI SUKRI","NUR FARISHA AMIRA BINTI ABDULLAH","NURUL ASYIQIN BINTI AHMAD","SITI NURHALIZA BINTI ROSLAN","WAN MUHAMMAD AMMAR BIN WAN AHMAD"],
+      "3S1": ["ADAM HARITH BIN MOHD SUKRI","AINA ZAFIRAH BINTI MOHD FAIZAL","AKIF DANIAL BIN ABDUL RAHMAN","ALEEYA MAISARAH BINTI ROZAIDI","ARISSA DAMIA BINTI HAIRUDIN","CHONG ZHI WEI","DANIEL HAIKAL BIN MOHD ZAKI","FARAH WAHIDA BINTI AHMAD","HAZIQ IRFAN BIN MOHD RIDZUA","ISMA DANIAL BIN ISMAIL","KHAIRUL IKRAM BIN KHAIRUL ANUAR","MIA SARA BINTI MOHD FAUZI","MOHAMMAD HARITH BIN HISHAM","MUHAMMAD AFIF BIN AZIZI","MUHAMMAD AIMAN HAKIM BIN SAID","MUHAMMAD AIRIEL SHAH BIN ABDULLAH","MUHAMMAD AMIR ASHRAF BIN AZHAR","MUHAMMAD DANIAL ASYRAF BIN MOHD RAZIF","MUHAMMAD FAKHRUL BIN AZMAN","NUR ALYA BATRISYIA BINTI ROSLAN","NUR DAMIA QASRINA BINTI MOHD YUSOF","NUR FAZLINDA BINTI JAMAL","NUR SYAZWANI BINTI AZMAN","PUTERI NUR AIN BINTI KASMIDON","SITI KHADIJAH BINTI MOHD ISA"],
+      "3S2": ["AHMAD DANISH BIN MOHD ZALALUDDIN","AINUL BASYIRAH BINTI ABDULLAH","ALIF NAJMI BIN MOHD AZRUL","AMIRUL SYAFIQ BIN NOR AZIZI","ASRAF DANIEL BIN ABDULLAH","AZWA SAFRINA BINTI AZLAN","DANIAL HAZIQ BIN ROSTAM","DHIA FARISHA BINTI AHMAD","FATIN NABILAH BINTI ROZAIDI","HANI BATRISYIA BINTI MOHD FAIZAL","KHAIRUL NAJWAN BIN KHAIRUL ANUAR","MOHAMAD ADAM FARHAN BIN ROZAIDI","MOHAMMAD FAKHRULLAH BIN MAZLAN","MUHAMMAD ALIF HAIKAL BIN MOHD YAZID","MUHAMMAD AMMAR HAZIQ BIN SHAMSUL","MUHAMMAD FAIZAL BIN ABDULLAH","MUHAMMAD HARITH DANIAL BIN ROSLAN","MUHAMMAD IRFAN BIN MOHD FAUZI","MUHAMMAD SYAHMI BIN ZAINAL","NUR AIN NATASHA BINTI SHAHRIL","NUR FARHANA BINTI ABDULLAH","NURUL IZZAH BINTI MOHD RAZIF","SITI NUR AMIRA BINTI ROSLAN","SYED AMIRUL BIN SYED OTHMAN"],
+      "4S1": ["ADIB FARHAN BIN MAZLAN","ALYAA MAISARAH BINTI SUHAIMI","CHEE HONG GUAN","DANIAL AIMAN BIN NOR AZIZI","FARAH NABILAH BINTI MOHD ZAKI","MUHAMMAD AIMAN BIN AZLAN","NUR ALYA FARZANA BINTI MOHD FAIZAL","TAN KAI WEI"],
+      "4S2": ["AHMAD SYAZWAN BIN SHAMSUL","ALIF FIKRI BIN ROSLAN","DANISH ASYRAF BIN KAMARUDIN","FARIS HAIKAL BIN MOHD RAZIF","INTAN SHAFINAZ BINTI AZMAN","KHAIRUL HAZIQ BIN ZULKIFLI","MOHD DANIAL BIN ROZAIDI","MUHAMMAD AQIL BIN MOHD HARIS","MUHAMMAD DANISH BIN ROSTAM","MUHAMMAD HAZIM BIN HAMDAN","MUHAMMAD SYAFIQ BIN AZHAR","NUR AINUL MARDHIAH BINTI ROSLI","NUR AMALINA BINTI MOHD YUSOF","NUR BATRISYIA BINTI MOHD FAUZI","NUR FARISHA BINTI ISMAIL","NURUL JANNAH BINTI ABDULLAH","SITI AISYAH BINTI MOHD ISA","WAN DANISH BIN WAN AHMAD"],
+      "4S3": ["AIDIL PUTRA BIN ABDULLAH","AMIRUL HAKIMI BIN AZIZI","FARAH NATASHA BINTI AHMAD","HAZWAN BIN JAMALUDDIN","LUQMAN NUR HAKIM BIN ROSLAN","MOHAMAD FAIZ BIN SAID","MUHAMMAD FARHAN BIN MOHD YAZID","MUHAMMAD HARITH BIN AZLAN","NUR DAMIA BINTI KASMIDON","NUR IZZATI BINTI MOHD RAZIF","NURUL AINA BINTI SHAHRIL","PUTERA IRFAN BIN KASMIDON","ZULHILMI BIN ZAINAL"],
+      "5S1": ["AFIQAH BATRISYIA BINTI MOHD FAIZAL","CHUA JUN HAO","DANISH IRFAN BIN MOHD ZAKI","FARAH DIANA BINTI MOHD RAZIF","LEE JIA HUI","MUHAMMAD AMIRUL AMIN BIN AZMAN","NUR ATHIRAH BINTI ROSLAN","SITI ZULAIKHA BINTI ROZAIDI","TAN JIA WEI"],
+      "5S2": ["AHMAD HAZIM BIN ROSLAN","ALIA NATASHA BINTI SUHAIMI","DANIAL FARHAN BIN KAMARUDIN","FATIN ATHIRAH BINTI MOHD FAUZI","IRFAN HAKIMI BIN AZIZI","KHAIRUL ANUAR BIN ZULKIFLI","MOHAMAD DANISH BIN ROSTAM","MUHAMMAD AIDIL BIN MOHD HARIS","MUHAMMAD AIMAN BIN AZHAR","MUHAMMAD FAKHRUL RADZI BIN ROZAIDI","MUHAMMAD HARIZ BIN HAMDAN","NUR AINA MAISARAH BINTI MOHD YUSOF","NUR DAMIA FITRIYAH BINTI ROSLI","NUR FATIHAH BINTI ISMAIL","NUR SYAZANA BINTI AZMAN","NURUL HUDA BINTI ABDULLAH","SITI NOR AISHAH BINTI MOHD ISA","SYED FARIS BIN SYED OTHMAN","WAN HAZIQAH BINTI WAN AHMAD"],
+      "5S3": ["ADAM LUQMAN BIN ABDULLAH","AMIRA BALQIS BINTI AHMAD","FAUZAN BIN JAMALUDDIN","HAIKAL BIN MOHD YAZID","MOHAMAD ZULKIFLI BIN SAID","MUHAMMAD ARIF BIN ROSLAN","MUHAMMAD IRFAN BIN AZLAN","NUR AIN SYAFIQAH BINTI KASMIDON","NUR SHAHIRA BINTI MOHD RAZIF","NURUL NADIA BINTI SHAHRIL","PUTERA AMIRUL BIN KASMIDON","ZAINAL ABIDIN BIN ZAINAL"]
+    };
+
+    let latenessRecords = [];
+    let activeRange = 'day';
+    let customSelectedDate = '';
+
+    window.onload = function() {
+      initClock();
+      initDefaultDate();
+      setCurrentArrivalTime();
+      populateClassSelect();
+      loadRemoteLatenessData();
+    };
+
+    function initClock() {
+      setInterval(() => {
+        document.getElementById('autoClock').innerText = new Date().toLocaleTimeString('ms-MY', { hour12: false });
+      }, 1000);
+      document.getElementById('autoClock').innerText = new Date().toLocaleTimeString('ms-MY', { hour12: false });
+    }
+
+    function initDefaultDate() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('inputTarikh').value = today;
+      document.getElementById('filterCustomDate').value = today;
+      customSelectedDate = today;
+    }
+
+    function setCurrentArrivalTime() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('inputMasaTiba').value = `${hours}:${mins}`;
+    }
+
+    function populateClassSelect() {
+      const select = document.getElementById('selectKelas');
+      select.innerHTML = '';
+      Object.keys(STUDENTS_DATA).forEach(cls => {
+        const opt = document.createElement('option');
+        opt.value = cls;
+        opt.textContent = `Kelas ${cls}`;
+        select.appendChild(opt);
+      });
+      populateStudentSelect();
+    }
+
+    function populateStudentSelect() {
+      const cls = document.getElementById('selectKelas').value;
+      const selectMurid = document.getElementById('selectMurid');
+      selectMurid.innerHTML = '';
+      const list = STUDENTS_DATA[cls] || [];
+      list.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        selectMurid.appendChild(opt);
+      });
+    }
+
+    function switchPage(pageId) {
+      ['pelaporan', 'dashboard', 'statistik'].forEach(p => {
+        document.getElementById(`page-${p}`).classList.add('hidden');
+        document.getElementById(`tab-${p}`).classList.remove('bg-white', 'text-rose-950', 'shadow-sm');
+        document.getElementById(`tab-${p}`).classList.add('text-slate-600');
+      });
+
+      document.getElementById(`page-${pageId}`).classList.remove('hidden');
+      document.getElementById(`tab-${pageId}`).classList.add('bg-white', 'text-rose-950', 'shadow-sm');
+      document.getElementById(`tab-${pageId}`).classList.remove('text-slate-600');
+
+      if (pageId === 'dashboard') renderDashboard();
+      if (pageId === 'statistik') renderStatistik();
+    }
+
+    function resetPelaporanForm() {
+      setCurrentArrivalTime();
+      document.getElementById('selectSebab').selectedIndex = 0;
+      document.getElementById('selectTindakan').selectedIndex = 0;
+    }
+
+    // SIMPAN REKOD KE GOOGLE APPS SCRIPT
+    async function saveLatenessRecord() {
+      const btn = document.getElementById('btnSaveLateness');
+      const tarikh = document.getElementById('inputTarikh').value;
+      const masaTiba = document.getElementById('inputMasaTiba').value;
+      const kelas = document.getElementById('selectKelas').value;
+      const nama = document.getElementById('selectMurid').value;
+      const sebab = document.getElementById('selectSebab').value;
+      const pencatat = document.getElementById('inputPencatat').value.trim() || "Guru Bertugas";
+      const tindakan = document.getElementById('selectTindakan').value;
+
+      if (!nama) {
+        alert("Sila pilih nama murid terlebih dahulu.");
+        return;
+      }
+
+      const payload = {
+        action: "submitLateness",
+        tarikh: tarikh,
+        masaTiba: masaTiba,
+        kelas: kelas,
+        nama: nama,
+        sebab: sebab,
+        pencatat: pencatat,
+        tindakan: tindakan
+      };
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
+
+      // Jika URL Google Apps Script sah digunakan
+      if (GAS_LEWAT_API_URL && !GAS_LEWAT_API_URL.includes("GANTIKAN_DENGAN")) {
+        try {
+          await fetch(GAS_LEWAT_API_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          alert(`Kemasukan lewat bagi ${nama} (${kelas}) berjaya direkodkan!`);
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Rekod Murid Lewat`;
+          setTimeout(loadRemoteLatenessData, 1500);
+          switchPage('dashboard');
+        } catch (e) {
+          alert("Ralat menghantar data: " + e.message);
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Rekod Murid Lewat`;
+        }
+      } else {
+        // Mode Tempatan (LocalStorage) jika URL belum dimasukkan
+        const cached = JSON.parse(localStorage.getItem('smkka_lewat_records') || '[]');
+        cached.push({
+          id: "LWT_" + Date.now().toString().slice(-6),
+          recordTimestamp: new Date().toLocaleString('ms-MY'),
+          tarikh: payload.tarikh,
+          masaTiba: payload.masaTiba,
+          kelas: payload.kelas,
+          nama: payload.nama,
+          sebab: payload.sebab,
+          pencatat: payload.pencatat,
+          tindakan: payload.tindakan
+        });
+        localStorage.setItem('smkka_lewat_records', JSON.stringify(cached));
+        latenessRecords = cached;
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Rekod Murid Lewat`;
+        alert(`Rekod disimpan dalam storan tempatan! (Sila masukkan GAS_LEWAT_API_URL untuk sambungan Google Sheets sebenar).`);
+        switchPage('dashboard');
+      }
+    }
+
+    // MUAT REKOD DARI GOOGLE APPS SCRIPT
+    async function loadRemoteLatenessData() {
+      if (GAS_LEWAT_API_URL && !GAS_LEWAT_API_URL.includes("GANTIKAN_DENGAN")) {
+        try {
+          const res = await fetch(GAS_LEWAT_API_URL);
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            latenessRecords = data;
+            renderDashboard();
+            renderStatistik();
+          }
+        } catch (e) {
+          console.warn("Gagal menghubungi Google Apps Script, menggunakan rekod cache tempatan:", e);
+          latenessRecords = JSON.parse(localStorage.getItem('smkka_lewat_records') || '[]');
+          renderDashboard();
+          renderStatistik();
+        }
+      } else {
+        latenessRecords = JSON.parse(localStorage.getItem('smkka_lewat_records') || '[]');
+        renderDashboard();
+        renderStatistik();
+      }
+    }
+
+    // ==================== DASHBOARD LOGIC ====================
+    function renderDashboard() {
+      const today = document.getElementById('inputTarikh').value || new Date().toISOString().split('T')[0];
+      document.getElementById('dashTodayDateLabel').innerText = today;
+
+      const recordsToday = latenessRecords.filter(r => r.tarikh === today);
+      document.getElementById('dashTodayCount').innerText = `${recordsToday.length} Murid`;
+
+      // Kira kelas paling banyak lewat
+      const classCount = {};
+      let totalMins = 0;
+      let validTimeCount = 0;
+
+      recordsToday.forEach(r => {
+        classCount[r.kelas] = (classCount[r.kelas] || 0) + 1;
+        if (r.masaTiba && r.masaTiba.includes(':')) {
+          const [h, m] = r.masaTiba.split(':').map(Number);
+          if (!isNaN(h) && !isNaN(m)) {
+            totalMins += (h * 60 + m);
+            validTimeCount++;
+          }
+        }
+      });
+
+      let topClass = "--";
+      let maxC = 0;
+      Object.keys(classCount).forEach(c => {
+        if (classCount[c] > maxC) {
+          maxC = classCount[c];
+          topClass = `${c} (${maxC} Kes)`;
+        }
+      });
+      document.getElementById('dashTopLateClass').innerText = topClass;
+
+      if (validTimeCount > 0) {
+        const avgTotalMins = Math.round(totalMins / validTimeCount);
+        const avgH = String(Math.floor(avgTotalMins / 60)).padStart(2, '0');
+        const avgM = String(avgTotalMins % 60).padStart(2, '0');
+        document.getElementById('dashAvgLateTime').innerText = `${avgH}:${avgM} Pagi`;
+      } else {
+        document.getElementById('dashAvgLateTime').innerText = "--:--";
+      }
+
+      // Isi Jadual Hari Ini
+      const tbody = document.getElementById('dashTodayTableBody');
+      tbody.innerHTML = '';
+
+      if (recordsToday.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs italic">Tahniah! Tiada rekod murid datang lewat bagi tarikh hari ini (${today}).</td></tr>`;
+        return;
+      }
+
+      recordsToday.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="py-3 px-5 font-mono text-xs font-bold text-rose-700">${row.masaTiba}</td>
+          <td class="py-3 px-5 font-bold text-slate-800">${row.kelas}</td>
+          <td class="py-3 px-5 font-semibold text-slate-700">${row.nama}</td>
+          <td class="py-3 px-5">
+            <span class="bg-rose-50 text-rose-800 border border-rose-200 px-2 py-0.5 rounded text-xs font-medium">
+              ${row.sebab}
+            </span>
+          </td>
+          <td class="py-3 px-5 text-xs text-slate-500">${row.pencatat}</td>
+          <td class="py-3 px-5">
+            <span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded text-xs font-bold border border-slate-200">
+              ${row.tindakan}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ==================== STATISTIK & KEKERAPAN LOGIC ====================
+    function getYesterdayDateStr(refDateStr) {
+      const base = refDateStr ? new Date(refDateStr) : new Date();
+      base.setDate(base.getDate() - 1);
+      return base.toISOString().split('T')[0];
+    }
+
+    function setTimeRange(range) {
+      activeRange = range;
+      ['yesterday', 'day', 'week', 'month', 'year'].forEach(r => {
+        const btn = document.getElementById(`filter-${r}`);
+        if (!btn) return;
+        if (r === range) {
+          btn.classList.add('bg-white', 'shadow-xs', 'text-rose-900');
+          btn.classList.remove('text-slate-600');
+        } else {
+          btn.classList.remove('bg-white', 'shadow-xs', 'text-rose-900');
+          btn.classList.add('text-slate-600');
+        }
+      });
+      renderStatistik();
+    }
+
+    function onCustomDateChange() {
+      const val = document.getElementById('filterCustomDate').value;
+      if (val) {
+        customSelectedDate = val;
+        activeRange = 'custom';
+        ['yesterday', 'day', 'week', 'month', 'year'].forEach(r => {
+          const btn = document.getElementById(`filter-${r}`);
+          if (btn) {
+            btn.classList.remove('bg-white', 'shadow-xs', 'text-rose-900');
+            btn.classList.add('text-slate-600');
+          }
+        });
+        renderStatistik();
+      }
+    }
+
+    function renderStatistik() {
+      const inputDate = document.getElementById('inputTarikh').value || new Date().toISOString().split('T')[0];
+      const yesterdayStr = getYesterdayDateStr(inputDate);
+      const targetDate = new Date(inputDate);
+
+      let rangeLabel = "Hari Ini";
+
+      const filtered = latenessRecords.filter(r => {
+        const d = new Date(r.tarikh);
+        if (activeRange === 'yesterday') {
+          rangeLabel = `Semalam (${yesterdayStr})`;
+          return r.tarikh === yesterdayStr;
+        } else if (activeRange === 'day') {
+          rangeLabel = `Hari Ini (${inputDate})`;
+          return r.tarikh === inputDate;
+        } else if (activeRange === 'custom') {
+          rangeLabel = `Tarikh Khusus (${customSelectedDate})`;
+          return r.tarikh === customSelectedDate;
+        } else if (activeRange === 'week') {
+          rangeLabel = `7 Hari Terakhir`;
+          const diffDays = (targetDate - d) / (1000 * 3600 * 24);
+          return diffDays >= 0 && diffDays <= 7;
+        } else if (activeRange === 'month') {
+          rangeLabel = `Bulan Ini`;
+          return d.getMonth() === targetDate.getMonth() && d.getFullYear() === targetDate.getFullYear();
+        } else if (activeRange === 'year') {
+          rangeLabel = `Tahun 2027`;
+          return d.getFullYear() === targetDate.getFullYear();
+        }
+        return true;
+      });
+
+      document.getElementById('statSelectedRangeText').innerText = rangeLabel;
+      document.getElementById('subtextStatRange').innerText = `Menunjukkan rekod bagi sela masa: ${rangeLabel}`;
+      document.getElementById('statTotalLateCases').innerText = `${filtered.length} Kes`;
+
+      // Kira kekerapan individu murid & punca lewat
+      const freqStudent = {};
+      const reasonCount = {};
+
+      filtered.forEach(r => {
+        const key = `${r.nama}___${r.kelas}`;
+        freqStudent[key] = (freqStudent[key] || 0) + 1;
+        reasonCount[r.sebab] = (reasonCount[r.sebab] || 0) + 1;
+      });
+
+      document.getElementById('statUniqueStudentsCount').innerText = `${Object.keys(freqStudent).length} Murid`;
+
+      // Cari Punca Utama
+      let topReason = "--";
+      let maxR = 0;
+      Object.keys(reasonCount).forEach(s => {
+        if (reasonCount[s] > maxR) {
+          maxR = reasonCount[s];
+          topReason = `${s} (${maxR} kes)`;
+        }
+      });
+      document.getElementById('statTopReason').innerText = topReason;
+
+      // 1. Senarai Murid Tegar Datang Lambat (Disusun mengikut jumlah kali)
+      const listFreqEl = document.getElementById('listFrequentLateStudents');
+      listFreqEl.innerHTML = '';
+      const sortedFreq = Object.entries(freqStudent).sort((a, b) => b[1] - a[1]);
+      document.getElementById('countFrequentLateBadge').innerText = `${sortedFreq.length} Murid`;
+
+      if (sortedFreq.length === 0) {
+        listFreqEl.innerHTML = `<p class="text-xs text-slate-400 italic py-6 text-center">Tiada rekod murid datang lambat dalam sela masa ini.</p>`;
+      } else {
+        sortedFreq.forEach(([key, count]) => {
+          const [nama, kelas] = key.split('___');
+          const div = document.createElement('div');
+          div.className = "flex items-center justify-between p-2.5 hover:bg-slate-50 rounded-xl border border-slate-100 mb-2";
+          div.innerHTML = `
+            <div>
+              <p class="text-xs font-bold text-slate-800">${nama}</p>
+              <p class="text-[11px] text-slate-400 font-semibold">Kelas: ${kelas}</p>
+            </div>
+            <span class="bg-rose-100 text-rose-900 text-xs px-2.5 py-1 rounded-lg font-extrabold flex items-center gap-1">
+              <i class="fa-solid fa-repeat text-[10px]"></i> ${count} Kali Lewat
+            </span>
+          `;
+          listFreqEl.appendChild(div);
+        });
+      }
+
+      // 2. Pecahan Sebab Datang Lambat
+      const listReasonEl = document.getElementById('listReasonBreakdown');
+      listReasonEl.innerHTML = '';
+      const sortedReasons = Object.entries(reasonCount).sort((a, b) => b[1] - a[1]);
+
+      if (sortedReasons.length === 0) {
+        listReasonEl.innerHTML = `<p class="text-xs text-slate-400 italic py-6 text-center">Tiada data sebab dalam sela masa ini.</p>`;
+      } else {
+        sortedReasons.forEach(([sebab, count]) => {
+          const pct = ((count / filtered.length) * 100).toFixed(1);
+          const div = document.createElement('div');
+          div.className = "p-2.5 rounded-xl border border-slate-100 mb-2 bg-slate-50/60";
+          div.innerHTML = `
+            <div class="flex justify-between items-center text-xs mb-1">
+              <span class="font-bold text-slate-700">${sebab}</span>
+              <span class="font-extrabold text-rose-800">${count} kes (${pct}%)</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="bg-rose-800 h-full" style="width: ${pct}%"></div>
+            </div>
+          `;
+          listReasonEl.appendChild(div);
+        });
+      }
+
+      // 3. Log Lengkap Jadual Sela Masa
+      const fullTbody = document.getElementById('statFullTableBody');
+      fullTbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        fullTbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400 text-xs italic">Tiada rekod lewat dijumpai bagi sela masa ini.</td></tr>`;
+      } else {
+        filtered.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-50 transition";
+          tr.innerHTML = `
+            <td class="py-2.5 px-5 font-mono text-xs text-slate-600">${row.tarikh}</td>
+            <td class="py-2.5 px-5 font-mono text-xs font-bold text-rose-700">${row.masaTiba}</td>
+            <td class="py-2.5 px-5 font-bold text-slate-800">${row.kelas}</td>
+            <td class="py-2.5 px-5 font-semibold text-slate-700">${row.nama}</td>
+            <td class="py-2.5 px-5">
+              <span class="bg-rose-50 text-rose-800 border border-rose-200 px-2 py-0.5 rounded text-xs font-medium">
+                ${row.sebab}
+              </span>
+            </td>
+            <td class="py-2.5 px-5 text-xs text-slate-600 font-medium">${row.tindakan}</td>
+          `;
+          fullTbody.appendChild(tr);
+        });
+      }
+    }
+  </script>
+</body>
+</html>
