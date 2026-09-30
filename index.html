@@ -323,7 +323,12 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kata Laluan Admin</label>
-          <input type="password" id="adminPasswordInput" placeholder="Masukkan password..." class="w-full border border-slate-300 rounded-xl px-4 py-2.5 font-medium outline-none focus:ring-2 focus:ring-rose-500 text-slate-800">
+          <input type="password" id="adminPasswordInput" placeholder="Masukkan password..." onkeydown="if(event.key==='Enter') verifyAdminPassword()" class="w-full border border-slate-300 rounded-xl px-4 py-2.5 font-medium outline-none focus:ring-2 focus:ring-rose-500 text-slate-800">
+          
+          <!-- Mesej ralat inline tanpa dialog alert -->
+          <p id="adminErrorNotice" class="hidden text-xs text-rose-600 font-bold mt-2 flex items-center gap-1.5 bg-rose-50 border border-rose-200 px-3 py-2 rounded-lg">
+            <i class="fa-solid fa-circle-exclamation"></i> Kata laluan tidak tepat. Sila cuba lagi.
+          </p>
         </div>
         <button onclick="verifyAdminPassword()" class="w-full bg-rose-800 hover:bg-rose-900 text-white font-bold py-2.5 rounded-xl transition shadow-sm flex items-center justify-center gap-2">
           <i class="fa-solid fa-key"></i> Sahkan Kata Laluan
@@ -848,18 +853,28 @@
 
     // ==================== LOGIK ADMIN, IMPORT EXCEL & PENGAPUNGAN ====================
     function verifyAdminPassword() {
-      const pwd = document.getElementById('adminPasswordInput').value;
+      const pwdInput = document.getElementById('adminPasswordInput');
+      const errorNotice = document.getElementById('adminErrorNotice');
+      const pwd = pwdInput.value;
+
       if (pwd === "adminlewat") {
+        if (errorNotice) errorNotice.classList.add('hidden');
         document.getElementById('adminAuthBox').classList.add('hidden');
         document.getElementById('adminPanelBox').classList.remove('hidden');
-        document.getElementById('adminPasswordInput').value = '';
+        pwdInput.value = '';
         renderFloatingContainer();
       } else {
-        alert("Kata laluan salah! Sila masukkan 'adminlewat'.");
+        // Paparkan ralat secara visual tanpa membocorkan kata laluan
+        if (errorNotice) errorNotice.classList.remove('hidden');
+        pwdInput.value = '';
+        pwdInput.focus();
       }
     }
 
     function adminLogout() {
+      const errorNotice = document.getElementById('adminErrorNotice');
+      if (errorNotice) errorNotice.classList.add('hidden');
+
       document.getElementById('adminAuthBox').classList.remove('hidden');
       document.getElementById('adminPanelBox').classList.add('hidden');
       document.getElementById('adminPreviewArea').classList.add('hidden');
