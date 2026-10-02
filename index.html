@@ -500,19 +500,16 @@
       const str = String(raw).trim();
       if (!str) return "";
 
-      // Format: YYYY-MM-DD atau YYYY/MM/DD
       const ymdMatch = str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
       if (ymdMatch) {
         return `${ymdMatch[1]}-${ymdMatch[2].padStart(2, '0')}-${ymdMatch[3].padStart(2, '0')}`;
       }
 
-      // Format: DD/MM/YYYY atau DD-MM-YYYY (format biasa APDM / Excel Malaysia)
       const dmyMatch = str.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);
       if (dmyMatch) {
         return `${dmyMatch[3]}-${dmyMatch[2].padStart(2, '0')}-${dmyMatch[1].padStart(2, '0')}`;
       }
 
-      // Fallback cuba baca tarikh
       const parsed = new Date(str);
       if (!isNaN(parsed.getTime())) {
         return getTodayLocalStr(parsed);
@@ -663,7 +660,6 @@
         tindakan: tindakan
       };
 
-      // Tambah rekod terus ke memori dan cache untuk paparan segera
       const optimisticRec = {
         id: "LWT_" + Date.now().toString().slice(-6),
         recordTimestamp: new Date().toLocaleString('ms-MY'),
@@ -864,7 +860,20 @@
       baseDate.setDate(baseDate.getDate() - 1);
       const yesterdayStr = getTodayLocalStr(baseDate);
 
-      // Tetapkan teks label sela masa sebelum membuat penapisan
+      // KIRA HARI ISNIN HINGGA SABTU BAGI MINGGU BERKENAAN
+      const refD = new Date(selectedParts.year, selectedParts.month - 1, selectedParts.day);
+      const dayOfWeek = refD.getDay(); // 0 = Ahad, 1 = Isnin ... 6 = Sabtu
+      const diffToMon = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek);
+      const monD = new Date(selectedParts.year, selectedParts.month - 1, selectedParts.day + diffToMon);
+      const satD = new Date(monD.getFullYear(), monD.getMonth(), monD.getDate() + 5);
+
+      const monStr = getTodayLocalStr(monD);
+      const satStr = getTodayLocalStr(satD);
+
+      const dMonLabel = String(monD.getDate()).padStart(2, '0') + '/' + String(monD.getMonth() + 1).padStart(2, '0');
+      const dSatLabel = String(satD.getDate()).padStart(2, '0') + '/' + String(satD.getMonth() + 1).padStart(2, '0') + '/' + satD.getFullYear();
+
+      // Tetapkan teks label sela masa
       let rangeLabel = "Hari Ini";
       if (activeRange === 'yesterday') {
         rangeLabel = `Semalam (${yesterdayStr})`;
@@ -874,7 +883,7 @@
         const cust = normalizeDateString(customSelectedDate || document.getElementById('filterCustomDate').value);
         rangeLabel = `Tarikh Khusus (${cust || selectedDay})`;
       } else if (activeRange === 'week') {
-        rangeLabel = `7 Hari Terakhir (Hingga ${selectedDay})`;
+        rangeLabel = `Minggu Ini (Isnin - Sabtu: ${dMonLabel} - ${dSatLabel})`;
       } else if (activeRange === 'month') {
         const namaBulan = ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
         rangeLabel = `Bulan ${namaBulan[selectedParts.month - 1]} ${selectedParts.year}`;
@@ -884,7 +893,7 @@
         rangeLabel = `Tahun 2027`;
       }
 
-      // Logik Penapisan Mantap
+      // Logik Penapisan
       const filtered = latenessRecords.filter(r => {
         const recDateStr = normalizeDateString(r.tarikh);
         if (!recDateStr) return false;
@@ -899,10 +908,8 @@
           const cust = normalizeDateString(customSelectedDate || document.getElementById('filterCustomDate').value);
           return recDateStr === cust;
         } else if (activeRange === 'week') {
-          const refD = new Date(selectedParts.year, selectedParts.month - 1, selectedParts.day);
-          const recD = new Date(recParts.year, recParts.month - 1, recParts.day);
-          const diffDays = Math.round((refD - recD) / (1000 * 3600 * 24));
-          return diffDays >= 0 && diffDays <= 7;
+          // Hanya murid yang direkodkan dari Isnin hingga Sabtu minggu ini
+          return recDateStr >= monStr && recDateStr <= satStr;
         } else if (activeRange === 'month') {
           return recParts.year === selectedParts.year && recParts.month === selectedParts.month;
         } else if (activeRange === 'year2026') {
