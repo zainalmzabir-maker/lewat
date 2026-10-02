@@ -33,22 +33,31 @@
         </div>
       </div>
 
-      <!-- NAVIGATION TABS -->
-      <nav class="flex bg-slate-100 p-1.5 rounded-xl gap-1">
-        <button onclick="switchPage('pelaporan')" id="tab-pelaporan" class="nav-tab px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all bg-white text-rose-950 shadow-sm">
-          <i class="fa-solid fa-clock-user mr-1"></i> Pelaporan Pintu Pagar
-        </button>
-        <button onclick="switchPage('dashboard')" id="tab-dashboard" class="nav-tab px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all text-slate-600 hover:text-rose-900">
-          <i class="fa-solid fa-chart-pie mr-1"></i> Dashboard Hari Ini
-        </button>
-        <button onclick="switchPage('statistik')" id="tab-statistik" class="nav-tab px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all text-slate-600 hover:text-rose-900">
-          <i class="fa-solid fa-chart-column mr-1"></i> Statistik & Kekerapan
-        </button>
-        <button onclick="switchPage('admin')" id="tab-admin" class="nav-tab px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all text-rose-700 hover:bg-rose-50 flex items-center gap-1.5">
-          <i class="fa-solid fa-user-shield"></i> Admin
-          <span id="badgeOrphanNotice" class="hidden w-2 h-2 rounded-full bg-rose-600 pulse-alert"></span>
-        </button>
-      </nav>
+      <div class="flex flex-wrap items-center gap-2.5">
+        <!-- NAVIGATION TABS -->
+        <nav class="flex bg-slate-100 p-1.5 rounded-xl gap-1">
+          <button onclick="switchPage('pelaporan')" id="tab-pelaporan" class="nav-tab px-3 sm:px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all bg-white text-rose-950 shadow-sm">
+            <i class="fa-solid fa-clock-user mr-1"></i> Pelaporan Pintu Pagar
+          </button>
+          <button onclick="switchPage('dashboard')" id="tab-dashboard" class="nav-tab px-3 sm:px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all text-slate-600 hover:text-rose-900">
+            <i class="fa-solid fa-chart-pie mr-1"></i> Dashboard Hari Ini
+          </button>
+          <button onclick="switchPage('statistik')" id="tab-statistik" class="nav-tab px-3 sm:px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all text-slate-600 hover:text-rose-900">
+            <i class="fa-solid fa-chart-column mr-1"></i> Statistik & Kekerapan
+          </button>
+          <button onclick="switchPage('admin')" id="tab-admin" class="nav-tab px-3 sm:px-3.5 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all text-rose-700 hover:bg-rose-50 flex items-center gap-1.5">
+            <i class="fa-solid fa-user-shield"></i> Admin
+            <span id="badgeOrphanNotice" class="hidden w-2 h-2 rounded-full bg-rose-600 pulse-alert"></span>
+          </button>
+        </nav>
+
+        <!-- BUTANG KHAS PAUTAN KE SISTEM KEHADIRAN -->
+        <a href="https://hadir.semekar.com/" target="_blank" rel="noopener noreferrer" title="Buka Sistem Kehadiran Murid (SEMEKAR)" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm hover:shadow transition-all border border-emerald-500">
+          <i class="fa-solid fa-clipboard-user text-emerald-200"></i>
+          <span>Kehadiran Murid</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-0.5 opacity-80"></i>
+        </a>
+      </div>
     </div>
   </header>
 
@@ -325,7 +334,6 @@
           <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kata Laluan Admin</label>
           <input type="password" id="adminPasswordInput" placeholder="Masukkan password..." onkeydown="if(event.key==='Enter') verifyAdminPassword()" class="w-full border border-slate-300 rounded-xl px-4 py-2.5 font-medium outline-none focus:ring-2 focus:ring-rose-500 text-slate-800">
           
-          <!-- Mesej ralat inline tanpa dialog alert -->
           <p id="adminErrorNotice" class="hidden text-xs text-rose-600 font-bold mt-2 flex items-center gap-1.5 bg-rose-50 border border-rose-200 px-3 py-2 rounded-lg">
             <i class="fa-solid fa-circle-exclamation"></i> Kata laluan tidak tepat. Sila cuba lagi.
           </p>
@@ -417,10 +425,8 @@
 
   <!-- ==================== JAVASCRIPT ==================== -->
   <script>
-    // URL GOOGLE APPS SCRIPT ANDA
     const GAS_LEWAT_API_URL = "https://script.google.com/macros/s/AKfycbzclas6woxGLy0UNJDrerNhquwa5sDObYUvoyMrk2b152XwpXsnuD4FxhqiAeQKU1d4ow/exec";
 
-    // DATA DEFAULT AWAL APDM 2027 SMK KAMARUL ARIFFIN
     let STUDENTS_DATA = {
       "1S1": ["AISSY NAUFAL BIN ROSISKANDAR","AISY FATIH AMIRULLAH BIN AZMAN","DAMIA AMANI BINTI MOHD SUKRI @ MOHD SALLEH","FAIZ FAHRYZAL BIN MOHD HANIF","HOONG WAN WAN","JETHRO TAN HAO SHEN","LIM QI QUAN","LISA BINTI ROSLI","MICHELLE TAN MEI SEE","MUHAMMAD AARON EQUWAN BIN MOHD ISA","MUHAMMAD ADAM HARITH BIN MOHD FAUZI","MUHAMMAD ADHAM RAYYAN BIN MUHAMAD KHAIRUL","MUHAMMAD DANISH RIFQI BIN MOHD REDZUAN","MUHAMMAD FAZREEQ BIN MOHD FAZLY","MUHAMMAD HAKIMI BIN JAMALUDDIN","MUHAMMAD RAYYAN HAKIMY BIN SAMSUDIN","MUHAMMAD SYAQIL HARRAZ BIN MOHD HAFIZAN","NUR AINA DAMIA BINTI MUHAMMAD NUR ARIFFIN","NUR ALEESYA BALQIS BINTI MOHD YUSOF","NUR AMALIN AISYAH BINTI NOR ISKANDAR","NUR BALQIS BINTI SAIFUL BAHRI"],
       "1S2": ["ANIKET ROY A/L BIJOY ROY","AQIL SUFIAN BIN SULAIMAN","FAITH BINTI YUSOP","FARAH AZYANI BINTI ASMAN","KHAIRUL ALIF BIN RAZAK","LUQMAN HAKIM BIN SAID","MOHAMAD AMIRUL ASYRAF BIN MOHAMMAD FAZLI","MOHAMAD DANIAL HAIKAL BIN ROZAIDI","MUHAMMAD AFIQ DARWISY BIN ABDULLAH","MUHAMMAD AIDIL ASRAF BIN AHMAD","MUHAMMAD AMMAR SHAH BIN SHAHRIZAL","MUHAMMAD ASYRAF BIN ZAINAL","MUHAMMAD DHIA'UDDIN NAUFAL BIN MUHAMMAD HAFIZ","MUHAMMAD DINIE SYAZWAN BIN SHAMSUL ARIFFIN","MUHAMMAD FIRDAUS BIN YUSRI","MUHAMMAD NUR HAZIQ RAYYAN BIN RAIMI","NUR ALYA SHAZWANI BINTI ABDULLAH","NUR DAMIA QISTINA BINTI MOHAMMAD FARIQ","NUR FATIHAH BINTI ABDULLAH","NUR HAZIQAH BINTI RAZALI","NURUL FATIHAH BINTI MOHD RAZIF","PUTERA DANIAL ZAKWAN BIN KASMIDON","PUTERI NUR SHAHIRAH BINTI SHAH REZAL"],
@@ -440,7 +446,6 @@
     let activeRange = 'day';
     let customSelectedDate = '';
 
-    // Admin Variables
     let newlyExtractedData = null;
     let missingStudentsList = [];
 
@@ -532,7 +537,6 @@
       document.getElementById('selectTindakan').selectedIndex = 0;
     }
 
-    // SIMPAN REKOD KE GOOGLE APPS SCRIPT
     async function saveLatenessRecord() {
       const btn = document.getElementById('btnSaveLateness');
       const tarikh = document.getElementById('inputTarikh').value;
@@ -582,7 +586,6 @@
       }
     }
 
-    // MUAT TURUN REKOD & MASTER MURID DARI GOOGLE APPS SCRIPT
     async function loadRemoteLatenessData() {
       try {
         const res = await fetch(GAS_LEWAT_API_URL);
@@ -604,7 +607,6 @@
       }
     }
 
-    // DASHBOARD LOGIC
     function renderDashboard() {
       const today = document.getElementById('inputTarikh').value || new Date().toISOString().split('T')[0];
       document.getElementById('dashTodayDateLabel').innerText = today;
@@ -677,7 +679,6 @@
       });
     }
 
-    // STATISTIK & KEKERAPAN LOGIC
     function getYesterdayDateStr(refDateStr) {
       const base = refDateStr ? new Date(refDateStr) : new Date();
       base.setDate(base.getDate() - 1);
@@ -773,7 +774,6 @@
       });
       document.getElementById('statTopReason').innerText = topReason;
 
-      // 1. Senarai Kekerapan Murid Tegar Datang Lambat
       const listFreqEl = document.getElementById('listFrequentLateStudents');
       listFreqEl.innerHTML = '';
       const sortedFreq = Object.entries(freqStudent).sort((a, b) => b[1] - a[1]);
@@ -799,7 +799,6 @@
         });
       }
 
-      // 2. Pecahan Punca / Sebab Datang Lambat
       const listReasonEl = document.getElementById('listReasonBreakdown');
       listReasonEl.innerHTML = '';
       const sortedReasons = Object.entries(reasonCount).sort((a, b) => b[1] - a[1]);
@@ -824,7 +823,6 @@
         });
       }
 
-      // 3. Log Lengkap Jadual Sela Masa
       const fullTbody = document.getElementById('statFullTableBody');
       fullTbody.innerHTML = '';
 
@@ -851,7 +849,6 @@
       }
     }
 
-    // ==================== LOGIK ADMIN, IMPORT EXCEL & PENGAPUNGAN ====================
     function verifyAdminPassword() {
       const pwdInput = document.getElementById('adminPasswordInput');
       const errorNotice = document.getElementById('adminErrorNotice');
@@ -864,7 +861,6 @@
         pwdInput.value = '';
         renderFloatingContainer();
       } else {
-        // Paparkan ralat secara visual tanpa membocorkan kata laluan
         if (errorNotice) errorNotice.classList.remove('hidden');
         pwdInput.value = '';
         pwdInput.focus();
@@ -883,7 +879,6 @@
       missingStudentsList = [];
     }
 
-    // Membaca fail Excel APDM dan mengesan murid yang hilang
     function handleExcelUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -944,7 +939,6 @@
       reader.readAsArrayBuffer(file);
     }
 
-    // Mengesan perbezaan data (Delta Detection)
     function detectMissingStudents(newData) {
       missingStudentsList = [];
 
@@ -957,7 +951,7 @@
             missingStudentsList.push({
               nama: oldName,
               kelas: cls,
-              action: 'keep' // Default: KEKALKAN
+              action: 'keep'
             });
           }
         });
@@ -984,7 +978,6 @@
       });
     }
 
-    // Papar Antaramuka Murid Diapungkan
     function renderOrphanListUI() {
       const container = document.getElementById('orphanStudentsList');
       container.innerHTML = '';
@@ -1031,7 +1024,6 @@
       }
     }
 
-    // Sahkan & Simpan Pangkalan Data Baru ke Google Sheets
     async function commitAdminUpdate() {
       if (!newlyExtractedData) {
         alert("Sila pilih fail Excel terlebih dahulu.");
