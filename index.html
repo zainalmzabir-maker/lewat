@@ -241,6 +241,11 @@
             <button onclick="setTimeRange('month')" id="filter-month" class="filter-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition hover:text-rose-900">
               Bulan Ini
             </button>
+            <!-- BUTANG TAHUN 2026 -->
+            <button onclick="setTimeRange('year2026')" id="filter-year2026" class="filter-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition hover:text-rose-900">
+              Tahun 2026
+            </button>
+            <!-- BUTANG TAHUN 2027 -->
             <button onclick="setTimeRange('year')" id="filter-year" class="filter-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition hover:text-rose-900">
               Tahun 2027
             </button>
@@ -251,21 +256,52 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-          <div class="bg-rose-50 border border-rose-200 p-4 rounded-xl">
-            <p class="text-xs font-bold text-rose-700">Jumlah Kes Lewat (Sela Masa)</p>
-            <p class="text-3xl font-black text-rose-900 mt-1" id="statTotalLateCases">0 Kes</p>
-            <p class="text-[11px] text-rose-600 mt-0.5" id="statSelectedRangeText">Hari Ini</p>
+        <!-- 4 KAD RINGKASAN: JUMLAH MURID SMKKA + STATISTIK LEWAT -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+          <!-- KAD 1: JUMLAH MURID SMKKA & TARIKH DATABASE -->
+          <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl flex flex-col justify-between">
+            <div>
+              <p class="text-xs font-bold text-blue-700 uppercase flex items-center gap-1.5">
+                <i class="fa-solid fa-users"></i> Jumlah Murid SMKKA
+              </p>
+              <p class="text-3xl font-black text-blue-950 mt-1" id="statTotalSchoolStudents">0 Murid</p>
+            </div>
+            <p class="text-[11px] text-blue-600 mt-2 font-medium flex items-center gap-1" id="statDbSyncDate">
+              <i class="fa-solid fa-database text-[10px]"></i> Database: Memuatkan...
+            </p>
           </div>
-          <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl">
-            <p class="text-xs font-bold text-amber-700">Bilangan Murid Terlibat (Individu)</p>
-            <p class="text-3xl font-black text-amber-800 mt-1" id="statUniqueStudentsCount">0 Murid</p>
-            <p class="text-[11px] text-amber-600 mt-0.5">Murid berbeza</p>
+
+          <!-- KAD 2: JUMLAH KES LEWAT -->
+          <div class="bg-rose-50 border border-rose-200 p-4 rounded-xl flex flex-col justify-between">
+            <div>
+              <p class="text-xs font-bold text-rose-700 uppercase flex items-center gap-1.5">
+                <i class="fa-solid fa-clock"></i> Jumlah Kes Lewat
+              </p>
+              <p class="text-3xl font-black text-rose-900 mt-1" id="statTotalLateCases">0 Kes</p>
+            </div>
+            <p class="text-[11px] text-rose-600 mt-2" id="statSelectedRangeText">Hari Ini</p>
           </div>
-          <div class="bg-purple-50 border border-purple-200 p-4 rounded-xl">
-            <p class="text-xs font-bold text-purple-700">Punca Utama Ketibaan Lewat</p>
-            <p class="text-lg font-black text-purple-950 mt-1 truncate" id="statTopReason">--</p>
-            <p class="text-[11px] text-purple-600 mt-0.5">Kekerapan tertinggi</p>
+
+          <!-- KAD 3: BILANGAN MURID TERLIBAT -->
+          <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex flex-col justify-between">
+            <div>
+              <p class="text-xs font-bold text-amber-700 uppercase flex items-center gap-1.5">
+                <i class="fa-solid fa-user-xmark"></i> Murid Terlibat
+              </p>
+              <p class="text-3xl font-black text-amber-800 mt-1" id="statUniqueStudentsCount">0 Murid</p>
+            </div>
+            <p class="text-[11px] text-amber-600 mt-2">Murid unik berbeza</p>
+          </div>
+
+          <!-- KAD 4: PUNCA UTAMA -->
+          <div class="bg-purple-50 border border-purple-200 p-4 rounded-xl flex flex-col justify-between">
+            <div>
+              <p class="text-xs font-bold text-purple-700 uppercase flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-question"></i> Punca Utama Lewat
+              </p>
+              <p class="text-lg font-black text-purple-950 mt-1 truncate" id="statTopReason">--</p>
+            </div>
+            <p class="text-[11px] text-purple-600 mt-2">Kekerapan tertinggi</p>
           </div>
         </div>
       </div>
@@ -433,7 +469,7 @@
       "2S1": ["AFIF DANIAL BIN AMIRUDDIN","AHMAD ZAFRAN BIN AHMAD ZAKWAN","AINUL MARDHIAH BINTI HAIRUL NIZAM","AIREL ARSYAD BIN AZRIN","ALYA NABILAH BINTI MOHD AZRUL","ALYSSA BINTI YUSOP","AWANGKU MUHAMMAD DANIAL BIN AWANGKU MOHD NIZAM","DAYANG NUR FARZANA BINTI ABDULLAH","FARISYA BINTI MOHD FAUZI","IZZ ZARA ZULAIKHA BINTI ABDULLAH","LIM JIA EN","MOHAMAD AQIL ZAFRI BIN MOHD ZALALUDDIN","MOHAMAD FARISH BIN AHMAD","MOHAMMAD ADIB FARHAN BIN MAZLAN","MUHAMMAD AFEEF DARWISY BIN MOHD RAZIF","MUHAMMAD ADAM BIN ABDULLAH","MUHAMMAD AMIRUL BIN MOHD FAIZAL","MUHAMMAD ARIF HAZIQ BIN MOHD ZAKI","MUHAMMAD HAZIQ HAKIMI BIN HAIRUDIN","NOOR ERYNA ERYSHA BINTI NOOR AZMAN","NOR AISYAH BINTI SUHAIMI","NUR ALEEYA NATASHA BINTI MOHD ROSLI","NUR DAMIA BATRISYIA BINTI ROSLAN"],
       "2S2": ["AHMAD HAZIQ BIN MOHD HARIS","AIREEN BATRISYIA BINTI MOHD FAZLY","AINUR JANNAH BINTI ABDULLAH","AIRIL SHAH BIN ABDULLAH","DANISH HAIKAL BIN KAMARUDIN","EZRA VALENTINE A/L ANTHONY","FARID ISKANDAR BIN ISMAIL","FATIN NUR ALISA BINTI ZAINAL","KHAIRUNNISA BINTI ZULKIFLI","MOHAMMAD DANISH HAKIM BIN MOHD YAZID","MUHAMMAD AIDIL SAFWAN BIN SAIFUL","MUHAMMAD ALIF IKHMAL BIN AZLAN","MUHAMMAD AMIRUL HAKIM BIN ROSLAN","MUHAMMAD AQIL DANIAL BIN AZMAN","MUHAMMAD DARWISY BIN NOR AZIZI","MUHAMMAD FARHAN BIN YUSOF","MUHAMMAD HARITH IZZAT BIN HAMDAN","MUHAMMAD IZZUL ISLAM BIN ROSTAM","NUR ADRIANA BATRISYIA BINTI MOHD FAIZAL","NUR AIN SHAFIEQAH BINTI SHAHRIL","NUR ALEESYA HUMAIRA BINTI MOHD KHAIRUL","NUR DAMIA INSYIRAH BINTI SUKRI","NUR FARISHA AMIRA BINTI ABDULLAH","NURUL ASYIQIN BINTI AHMAD","SITI NURHALIZA BINTI ROSLAN","WAN MUHAMMAD AMMAR BIN WAN AHMAD"],
       "3S1": ["ADAM HARITH BIN MOHD SUKRI","AINA ZAFIRAH BINTI MOHD FAIZAL","AKIF DANIAL BIN ABDUL RAHMAN","ALEEYA MAISARAH BINTI ROZAIDI","ARISSA DAMIA BINTI HAIRUDIN","CHONG ZHI WEI","DANIEL HAIKAL BIN MOHD ZAKI","FARAH WAHIDA BINTI AHMAD","HAZIQ IRFAN BIN MOHD RIDZUA","ISMA DANIAL BIN ISMAIL","KHAIRUL IKRAM BIN KHAIRUL ANUAR","MIA SARA BINTI MOHD FAUZI","MOHAMMAD HARITH BIN HISHAM","MUHAMMAD AFIF BIN AZIZI","MUHAMMAD AIMAN HAKIM BIN SAID","MUHAMMAD AIRIEL SHAH BIN ABDULLAH","MUHAMMAD AMIR ASHRAF BIN AZHAR","MUHAMMAD DANIAL ASYRAF BIN MOHD RAZIF","MUHAMMAD FAKHRUL BIN AZMAN","NUR ALYA BATRISYIA BINTI ROSLAN","NUR DAMIA QASRINA BINTI MOHD YUSOF","NUR FAZLINDA BINTI JAMAL","NUR SYAZWANI BINTI AZMAN","PUTERI NUR AIN BINTI KASMIDON","SITI KHADIJAH BINTI MOHD ISA"],
-      "3S2": ["AHMAD DANISH BIN MOHD ZALALUDDIN","AINUL BASYIRAH BINTI ABDULLAH","ALIF NAJMI BIN MOHD AZRUL","AMIRUL SYAFIQ BIN NOR AZIZI","ASRAF DANIEL BIN ABDULLAH","AZWA SAFRINA BINTI AZLAN","DANIAL HAZIQ BIN ROSTAM","DHIA FARISHA BINTI AHMAD","FATIN NABILAH BINTI ROZAIDI","HANI BATRISYIA BINTI MOHD FAIZAL","KHAIRUL NAJWAN BIN KHAIRUL ANUAR","MOHAMAD ADAM FARHAN BIN ROZAIDI","MOHAMMAD FAKHRULLAH BIN MAZLAN","MUHAMMAD ALIF HAIKAL BIN MOHD YAZID","MUHAMMAD AMMAR HAZIQ BIN SHAMSUL","MUHAMMAD FAIZAL BIN ABDULLAH","MUHAMMAD HARITH DANIAL BIN ROSLAN","MUHAMMAD IRFAN BIN MOHD FAUZI","MUHAMMAD SYAHMI BIN ZAINAL","NUR AIN NATASHA BINTI SHAHRIL","NUR FARHANA BINTI ABDULLAH","NURUL IZZAH BINTI MOHD RAZIF","SITI NUR AMIRA BINTI ROSLAN","SYED AMIRUL BIN SYED OTHMAN"],
+      "3S2": ["AHMAD DANISH BIN MOHD ZALALUDDIN","AINUL BASYIRAH BINTI ABDULLAH","ALIF NAJMI BIN MOHD AZRUL","AMIRUL SYAFIQ BIN NOR AZIZI","ASRAF DANIEL BIN ABDULLAH","AZWA SAFRINA BINTI AZLAN","DANIAL HAZIQ BIN ROSTAM","DHIA FARISHA BINTI AHMAD","FATIN NABILAH BINTI ROZAIDI","HANI BATRISYIA BINTI MOHD FAIZAL","KHAIRUL NAJWAN BIN KHAIRUL ANUAR","MOHAMAD ADAM FARHAN BIN ROZAIDI","MOHAMMAD FAKHRULLAH BIN MAZLAN","MUHAMMAD ALIF HAIKAL BIN MOHD YAZID","MUHAMMAD AMMAR HAZIQ BIN SHAMSUL","MUHAMMAD FAIZAL BIN ABDULLAH","MUHAMMAD HARITH DANIAL BIN ROSLAN","MUHAMMAD IRFAN BIN MOHD FAUZI","MUHAMMAD SYAHMI BIN ZAINAL","NUR AIN NATASHA BINTI SHAHRIL","NUR FARHANA BINTI ABDULLAH","NURUL IZZAH BINTI MOHD RAZIF","SITI韻 NUR AMIRA BINTI ROSLAN","SYED AMIRUL BIN SYED OTHMAN"],
       "4S1": ["ADIB FARHAN BIN MAZLAN","ALYAA MAISARAH BINTI SUHAIMI","CHEE HONG GUAN","DANIAL AIMAN BIN NOR AZIZI","FARAH NABILAH BINTI MOHD ZAKI","MUHAMMAD AIMAN BIN AZLAN","NUR ALYA FARZANA BINTI MOHD FAIZAL","TAN KAI WEI"],
       "4S2": ["AHMAD SYAZWAN BIN SHAMSUL","ALIF FIKRI BIN ROSLAN","DANISH ASYRAF BIN KAMARUDIN","FARIS HAIKAL BIN MOHD RAZIF","INTAN SHAFINAZ BINTI AZMAN","KHAIRUL HAZIQ BIN ZULKIFLI","MOHD DANIAL BIN ROZAIDI","MUHAMMAD AQIL BIN MOHD HARIS","MUHAMMAD DANISH BIN ROSTAM","MUHAMMAD HAZIM BIN HAMDAN","MUHAMMAD SYAFIQ BIN AZHAR","NUR AINUL MARDHIAH BINTI ROSLI","NUR AMALINA BINTI MOHD YUSOF","NUR BATRISYIA BINTI MOHD FAUZI","NUR FARISHA BINTI ISMAIL","NURUL JANNAH BINTI ABDULLAH","SITI AISYAH BINTI MOHD ISA","WAN DANISH BIN WAN AHMAD"],
       "4S3": ["AIDIL PUTRA BIN ABDULLAH","AMIRUL HAKIMI BIN AZIZI","FARAH NATASHA BINTI AHMAD","HAZWAN BIN JAMALUDDIN","LUQMAN NUR HAKIM BIN ROSLAN","MOHAMAD FAIZ BIN SAID","MUHAMMAD FARHAN BIN MOHD YAZID","MUHAMMAD HARITH BIN AZLAN","NUR DAMIA BINTI KASMIDON","NUR IZZATI BINTI MOHD RAZIF","NURUL AINA BINTI SHAHRIL","PUTERA IRFAN BIN KASMIDON","ZULHILMI BIN ZAINAL"],
@@ -484,6 +520,7 @@
         try { STUDENTS_DATA = JSON.parse(cached); } catch(e) {}
       }
       populateClassSelect();
+      updateSchoolStudentCard();
     }
 
     function populateClassSelect() {
@@ -527,7 +564,10 @@
       document.getElementById(`tab-${pageId}`).classList.remove('text-slate-600');
 
       if (pageId === 'dashboard') renderDashboard();
-      if (pageId === 'statistik') renderStatistik();
+      if (pageId === 'statistik') {
+        updateSchoolStudentCard();
+        renderStatistik();
+      }
       if (pageId === 'admin') renderFloatingContainer();
     }
 
@@ -594,7 +634,14 @@
         if (data.students && Object.keys(data.students).length > 0) {
           STUDENTS_DATA = data.students;
           localStorage.setItem('smkka_students_cache_lewat', JSON.stringify(STUDENTS_DATA));
+          
+          if (!localStorage.getItem('smkka_db_last_update')) {
+            const todayStr = new Date().toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            localStorage.setItem('smkka_db_last_update', todayStr);
+          }
+          
           populateClassSelect();
+          updateSchoolStudentCard();
         }
 
         if (Array.isArray(data.lateness)) {
@@ -604,6 +651,23 @@
         }
       } catch (e) {
         console.warn("Gagal menghubungi Google Apps Script:", e);
+      }
+    }
+
+    // Mengira jumlah keseluruhan murid dan mengemas kini tarikh database
+    function updateSchoolStudentCard() {
+      let total = 0;
+      Object.keys(STUDENTS_DATA).forEach(cls => {
+        total += (STUDENTS_DATA[cls] || []).length;
+      });
+
+      const elCount = document.getElementById('statTotalSchoolStudents');
+      if (elCount) elCount.innerText = `${total} Murid`;
+
+      const elDate = document.getElementById('statDbSyncDate');
+      if (elDate) {
+        const lastDate = localStorage.getItem('smkka_db_last_update') || new Date().toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        elDate.innerHTML = `<i class="fa-solid fa-database text-[10px]"></i> Database: ${lastDate}`;
       }
     }
 
@@ -687,7 +751,7 @@
 
     function setTimeRange(range) {
       activeRange = range;
-      ['yesterday', 'day', 'week', 'month', 'year'].forEach(r => {
+      ['yesterday', 'day', 'week', 'month', 'year2026', 'year'].forEach(r => {
         const btn = document.getElementById(`filter-${r}`);
         if (!btn) return;
         if (r === range) {
@@ -706,7 +770,7 @@
       if (val) {
         customSelectedDate = val;
         activeRange = 'custom';
-        ['yesterday', 'day', 'week', 'month', 'year'].forEach(r => {
+        ['yesterday', 'day', 'week', 'month', 'year2026', 'year'].forEach(r => {
           const btn = document.getElementById(`filter-${r}`);
           if (btn) {
             btn.classList.remove('bg-white', 'shadow-xs', 'text-rose-900');
@@ -718,6 +782,8 @@
     }
 
     function renderStatistik() {
+      updateSchoolStudentCard();
+
       const inputDate = document.getElementById('inputTarikh').value || new Date().toISOString().split('T')[0];
       const yesterdayStr = getYesterdayDateStr(inputDate);
       const targetDate = new Date(inputDate);
@@ -742,9 +808,12 @@
         } else if (activeRange === 'month') {
           rangeLabel = `Bulan Ini`;
           return d.getMonth() === targetDate.getMonth() && d.getFullYear() === targetDate.getFullYear();
+        } else if (activeRange === 'year2026') {
+          rangeLabel = `Tahun 2026`;
+          return d.getFullYear() === 2026;
         } else if (activeRange === 'year') {
           rangeLabel = `Tahun 2027`;
-          return d.getFullYear() === targetDate.getFullYear();
+          return d.getFullYear() === 2027;
         }
         return true;
       });
@@ -1065,7 +1134,13 @@
 
         STUDENTS_DATA = finalStudentsData;
         localStorage.setItem('smkka_students_cache_lewat', JSON.stringify(STUDENTS_DATA));
+
+        // Kemas kini tarikh dan masa terkini kemas kini database
+        const updateTimestamp = new Date().toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        localStorage.setItem('smkka_db_last_update', updateTimestamp);
+
         populateClassSelect();
+        updateSchoolStudentCard();
 
         alert(`Senarai murid berjaya disimpan! ${archivedToPurge.length} murid telah disahkan keluar/dihapuskan.`);
         btn.disabled = false;
